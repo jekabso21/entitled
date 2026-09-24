@@ -1,0 +1,23 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "ui": "tui",
+  "globalEnv": ["NODE_ENV"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".output/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {},
+    "check-types": {},
+    "test": {
+      "outputs": ["coverage/**"]
+    },
+    "test:e2e": {
+      "cache": false
+    }
+  }
+}

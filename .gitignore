@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.output/
+.nuxt/
+.nitro/
+.cache/
+.turbo/
+.vitest/
+coverage/
+playwright-report/
+test-results/
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+CLAUDE.md

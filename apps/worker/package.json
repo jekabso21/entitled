@@ -1,0 +1,30 @@
+{
+  "name": "@entitled/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#*": "./src/*"
+  },
+  "scripts": {
+    "dev": "node --watch --env-file-if-exists=../../.env src/main.ts",
+    "start": "node src/main.ts",
+    "lint": "eslint .",
+    "check-types": "tsc"
+  },
+  "dependencies": {
+    "@entitled/contracts": "workspace:*",
+    "@opentelemetry/api": "catalog:",
+    "nodemailer": "catalog:",
+    "pg-boss": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@entitled/config-eslint": "workspace:*",
+    "@entitled/config-typescript": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/nodemailer": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:"
+  }
+}

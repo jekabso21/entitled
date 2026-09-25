@@ -1,0 +1,41 @@
+# Local development services. Production compose lives in deploy/.
+name: entitled-dev
+
+services:
+  postgres:
+    image: postgres:18.6-alpine
+    environment:
+      POSTGRES_USER: entitled
+      POSTGRES_PASSWORD: entitled
+      POSTGRES_DB: entitled
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U entitled']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  storage:
+    image: rustfs/rustfs:1.0.3
+    environment:
+      RUSTFS_ACCESS_KEY: entitled
+      RUSTFS_SECRET_KEY: entitled-dev-secret
+      RUSTFS_CONSOLE_ENABLE: 'true'
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - storage_data:/data
+
+  mailpit:
+    image: axllent/mailpit:v1.31
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+
+volumes:
+  postgres_data:
+  storage_data:

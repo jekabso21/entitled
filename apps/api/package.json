@@ -1,0 +1,41 @@
+{
+  "name": "@entitled/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#*": "./src/*"
+  },
+  "scripts": {
+    "dev": "node --watch --env-file-if-exists=../../.env src/main.ts",
+    "start": "node src/main.ts",
+    "auth:generate": "auth generate --config src/lib/auth.ts --output ../../packages/db/src/schema/auth.ts --yes",
+    "lint": "eslint .",
+    "check-types": "tsc",
+    "test": "vitest run",
+    "storage:init": "node --env-file-if-exists=../../.env src/scripts/ensure-bucket.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "catalog:",
+    "@aws-sdk/s3-request-presigner": "catalog:",
+    "@better-auth/api-key": "catalog:",
+    "@better-auth/drizzle-adapter": "catalog:",
+    "@entitled/contracts": "workspace:*",
+    "@entitled/db": "workspace:*",
+    "@hono/node-server": "catalog:",
+    "@hono/zod-openapi": "catalog:",
+    "better-auth": "catalog:",
+    "drizzle-orm": "catalog:",
+    "hono": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@entitled/config-eslint": "workspace:*",
+    "@entitled/config-typescript": "workspace:*",
+    "@types/node": "catalog:",
+    "auth": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

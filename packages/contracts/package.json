@@ -1,0 +1,27 @@
+{
+  "name": "@entitled/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./errors": "./src/errors/index.ts",
+    "./jobs": "./src/jobs/index.ts",
+    "./releases": "./src/releases/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "check-types": "tsc",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@entitled/config-eslint": "workspace:*",
+    "@entitled/config-typescript": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

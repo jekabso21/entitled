@@ -1,0 +1,4 @@
+{
+  "extends": "@entitled/config-typescript/node.json",
+  "include": ["src", "*.config.ts"]
+}

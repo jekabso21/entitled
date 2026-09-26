@@ -1,4 +1,5 @@
-import { createDb } from '@entitled/db'
+import { createDb, createPool } from '@entitled/db'
 import { env } from '#config/env.ts'
 
-export const db = createDb(env.DATABASE_URL)
+export const pool = createPool(env.DATABASE_URL)
+export const db = createDb(pool)

@@ -11,8 +11,14 @@ export const auth = betterAuth({
   secret: env.BETTER_AUTH_SECRET,
   trustedOrigins: [env.WEB_URL],
   database: drizzleAdapter(db, { provider: 'pg', usePlural: true }),
-  // Accounts are invite-only: users join through organization invitations or are created by an admin.
-  emailAndPassword: { enabled: true, disableSignUp: true },
+  // Accounts are invite-only: users are created when they accept an invitation (see features/invitations).
+  emailAndPassword: { enabled: true, disableSignUp: true, minPasswordLength: 12 },
+  user: {
+    additionalFields: {
+      vendorRole: { type: 'string', required: false, input: false },
+    },
+  },
+  rateLimit: { storage: 'database' },
   advanced: { database: { generateId: 'uuid' } },
   telemetry: { enabled: false },
   plugins: [

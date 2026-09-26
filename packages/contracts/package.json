@@ -4,8 +4,10 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./accounts": "./src/accounts/index.ts",
+    "./client-accounts": "./src/client-accounts/index.ts",
     "./errors": "./src/errors/index.ts",
-    "./jobs": "./src/jobs/index.ts",
+    "./invitations": "./src/invitations/index.ts",
     "./releases": "./src/releases/index.ts"
   },
   "scripts": {

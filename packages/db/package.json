@@ -5,16 +5,19 @@
   "type": "module",
   "exports": {
     ".": "./src/client.ts",
-    "./schema": "./src/schema/index.ts"
+    "./schema": "./src/schema/index.ts",
+    "./migrate": "./src/migrate.ts"
   },
   "scripts": {
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "lint": "eslint .",
-    "check-types": "tsc"
+    "check-types": "tsc",
+    "db:migrate:runtime": "node src/scripts/migrate.ts"
   },
   "dependencies": {
+    "@opentelemetry/api": "catalog:",
     "drizzle-orm": "catalog:",
     "pg": "catalog:"
   },

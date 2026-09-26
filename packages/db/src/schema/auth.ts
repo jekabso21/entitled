@@ -2,6 +2,7 @@ import { defineRelationsPart, sql } from "drizzle-orm";
 import {
   pgTable,
   text,
+  bigint,
   timestamp,
   boolean,
   integer,
@@ -24,6 +25,7 @@ export const users = pgTable("users", {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
   twoFactorEnabled: boolean("two_factor_enabled").default(false),
+  vendorRole: text("vendor_role"),
 });
 
 export const sessions = pgTable(
@@ -208,6 +210,15 @@ export const apikeys = pgTable(
   ],
 );
 
+export const rateLimits = pgTable("rate_limits", {
+  id: uuid("id")
+    .default(sql`pg_catalog.gen_random_uuid()`)
+    .primaryKey(),
+  key: text("key").notNull().unique(),
+  count: integer("count").notNull(),
+  lastRequest: bigint("last_request", { mode: "number" }).notNull(),
+});
+
 export const authRelations = defineRelationsPart(
   {
     users,
@@ -219,6 +230,7 @@ export const authRelations = defineRelationsPart(
     invitations,
     twoFactors,
     apikeys,
+    rateLimits,
   },
   (r) => ({
     users: {

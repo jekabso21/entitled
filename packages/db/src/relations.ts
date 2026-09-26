@@ -18,6 +18,12 @@ const domainRelations = defineRelations(schema, (r) => ({
   artifacts: {
     release: r.one.releases({ from: r.artifacts.releaseId, to: r.releases.id }),
   },
+  accountInvitations: {
+    clientAccount: r.one.organizations({
+      from: r.accountInvitations.clientAccountId,
+      to: r.organizations.id,
+    }),
+  },
   entitlements: {
     clientAccount: r.one.organizations({
       from: r.entitlements.clientAccountId,

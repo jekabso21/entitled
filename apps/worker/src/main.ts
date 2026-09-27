@@ -1,8 +1,7 @@
-import { sendEmailQueue } from '@entitled/contracts/jobs'
+import { registerQueues, sendEmailQueue } from '@entitled/jobs'
 import { PgBoss } from 'pg-boss'
 import { env } from '#config/env.ts'
 import { sendEmail } from '#handlers/send-email.ts'
-import { registerQueues } from '#lib/queues.ts'
 
 const boss = new PgBoss(env.DATABASE_URL)
 boss.on('error', (err: unknown) => {

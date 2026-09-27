@@ -13,7 +13,7 @@
     "check-types": "tsc"
   },
   "dependencies": {
-    "@entitled/contracts": "workspace:*",
+    "@entitled/jobs": "workspace:*",
     "@opentelemetry/api": "catalog:",
     "nodemailer": "catalog:",
     "pg-boss": "catalog:",

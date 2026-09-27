@@ -1,4 +1,4 @@
-import { sendEmailJobSchema } from '@entitled/contracts/jobs'
+import { sendEmailJobSchema } from '@entitled/jobs'
 import type { Job } from 'pg-boss'
 import { env } from '#config/env.ts'
 import { mailer } from '#lib/mailer.ts'

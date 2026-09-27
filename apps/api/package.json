@@ -13,7 +13,9 @@
     "lint": "eslint .",
     "check-types": "tsc",
     "test": "vitest run",
-    "storage:init": "node --env-file-if-exists=../../.env src/scripts/ensure-bucket.ts"
+    "storage:init": "node --env-file-if-exists=../../.env src/scripts/ensure-bucket.ts",
+    "vendor:create-admin": "node --env-file-if-exists=../../.env src/scripts/create-vendor-admin.ts",
+    "seed:demo": "node --env-file-if-exists=../../.env src/scripts/seed-demo.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "catalog:",
@@ -22,17 +24,21 @@
     "@better-auth/drizzle-adapter": "catalog:",
     "@entitled/contracts": "workspace:*",
     "@entitled/db": "workspace:*",
+    "@entitled/jobs": "workspace:*",
     "@hono/node-server": "catalog:",
     "@hono/zod-openapi": "catalog:",
     "better-auth": "catalog:",
     "drizzle-orm": "catalog:",
     "hono": "catalog:",
+    "pg": "catalog:",
+    "pg-boss": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@entitled/config-eslint": "workspace:*",
     "@entitled/config-typescript": "workspace:*",
     "@types/node": "catalog:",
+    "@types/pg": "catalog:",
     "auth": "catalog:",
     "eslint": "catalog:",
     "typescript": "catalog:",

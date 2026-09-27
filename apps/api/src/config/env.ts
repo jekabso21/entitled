@@ -7,6 +7,7 @@ const envSchema = z.object({
   API_URL: z.url(),
   WEB_URL: z.url(),
   BETTER_AUTH_SECRET: z.string().min(32),
+  PORTAL_NAME: z.string().min(1).default('Entitled'),
   S3_ENDPOINT: z.url(),
   S3_REGION: z.string().min(1),
   S3_BUCKET: z.string().min(3),

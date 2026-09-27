@@ -13,7 +13,12 @@ export default withNuxt(...sharedRules, prettier).append(
     rules: { 'unicorn/filename-case': ['error', { case: 'pascalCase', checkDirectories: false }] },
   },
   {
-    files: ['app/pages/**/*.vue'],
-    rules: { 'unicorn/filename-case': 'off' },
+    // Route files follow URL segments ([token].vue, [...path].ts) and Nitro handlers need default exports.
+    files: ['app/pages/**/*.vue', 'server/routes/**/*.ts'],
+    rules: { 'unicorn/filename-case': 'off', 'import-x/no-default-export': 'off' },
+  },
+  {
+    files: ['app/plugins/**/*.ts', 'app/middleware/**/*.ts'],
+    rules: { 'import-x/no-default-export': 'off' },
   },
 )

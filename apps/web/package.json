@@ -9,11 +9,13 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
-    "check-types": "nuxt typecheck"
+    "check-types": "nuxt typecheck",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@entitled/contracts": "workspace:*",
     "@nuxt/ui": "catalog:",
+    "better-auth": "catalog:",
     "nuxt": "catalog:",
     "tailwindcss": "catalog:",
     "vue": "catalog:",
@@ -22,6 +24,7 @@
   "devDependencies": {
     "@entitled/config-eslint": "workspace:*",
     "@nuxt/eslint": "catalog:",
+    "@playwright/test": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "typescript": "catalog:",

@@ -1,21 +1,24 @@
 <script setup lang="ts">
-const { public: config } = useRuntimeConfig()
-const { data: health, status } = useApiHealth()
+definePageMeta({ layout: 'client' })
 
-useSeoMeta({ title: config.portalName })
+const { data: user } = useCurrentUser()
+const accountNames = computed(
+  () => user.value?.memberships.map((membership) => membership.clientAccountName).join(', ') ?? '',
+)
+
+useSeoMeta({ title: 'Products' })
 </script>
 
 <template>
-  <UContainer class="flex min-h-dvh flex-col items-center justify-center gap-6">
-    <h1 class="text-3xl font-semibold">{{ config.portalName }}</h1>
-    <p class="text-muted">Firmware, documentation and support for your products.</p>
-    <UBadge
-      v-if="status === 'success'"
-      :color="health?.status === 'ok' ? 'success' : 'warning'"
-      variant="subtle"
-    >
-      API {{ health?.status }}
-    </UBadge>
-    <UBadge v-else-if="status === 'error'" color="error" variant="subtle">API unreachable</UBadge>
-  </UContainer>
+  <div class="space-y-6">
+    <div>
+      <h1 class="text-2xl font-semibold text-highlighted">Your products</h1>
+      <p class="text-muted">{{ accountNames }}</p>
+    </div>
+    <UEmpty
+      icon="i-lucide-package"
+      title="No products yet"
+      description="Firmware releases and documentation appear here once your vendor grants access."
+    />
+  </div>
 </template>

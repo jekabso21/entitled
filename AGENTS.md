@@ -19,7 +19,13 @@ pnpm check                   # lint + check-types + test + prettier --check
 pnpm format                  # prettier --write
 pnpm --filter @entitled/db db:generate --name <change>   # SQL migration from schema changes
 pnpm --filter @entitled/api auth:generate    # regenerate Better Auth tables after auth config changes
+pnpm --filter @entitled/api seed:demo        # admin@entitled.local + client@acme.local (DEMO_PASSWORD)
+pnpm --filter @entitled/api vendor:create-admin --email <e> --name <n>   # first admin on a real install
+pnpm test:e2e                # Playwright against a running stack (E2E_BASE_URL, MAILPIT_URL)
+pnpm docker:up               # full stack in Docker behind Caddy: http://localhost:8080, mail :8026
 ```
+
+The Docker stack reads `deploy/.env` (copy `deploy/.env.example`). Its `init` service runs migrations, creates the bucket and seeds demo data when `SEED_DEMO=true`.
 
 Scope to one package with `pnpm --filter <name> <script>`. Never run `drizzle-kit push` against anything except a throwaway local database.
 
@@ -59,12 +65,13 @@ apps/
   worker/           pg-boss consumers: email, webhooks, rollout promotion
   cli/              release CLI for CI (phase 2)
 packages/
-  contracts/        Zod schemas + inferred types shared by api, web, worker, cli (incl. job payloads)
-  db/               Drizzle schema, relations, migrations, client factory
+  contracts/        Zod schemas + inferred types shared by api, web, cli
+  db/               Drizzle schema, relations, migrations, client factory, migration runner
+  jobs/             pg-boss queue names, payload schemas, queue registration, transactional enqueue
   markdown/         remark/rehype pipeline shared by web render and api export
   config-typescript/  tsconfig bases (base, node)
   config-eslint/      shared flat-config pieces
-deploy/             Dockerfiles, compose.yaml, Caddyfile, .gitlab-ci.yml snippet
+deploy/             Dockerfile (targets: server, web), compose.yaml, Caddyfile, .env.example
 docs/               project plan, ADRs (docs/adr/NNNN-title.md)
 ```
 
@@ -134,7 +141,7 @@ apps/web/
 
 ### TypeScript
 
-- The base tsconfig enables `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitOverride`, `noFallthroughCasesInSwitch`, `verbatimModuleSyntax`, `isolatedModules`, `erasableSyntaxOnly`, `moduleDetection: "force"`, `skipLibCheck` and `types: ["node"]` (Node packages).
+- The base tsconfig enables `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitOverride`, `noFallthroughCasesInSwitch`, `verbatimModuleSyntax`, `isolatedModules`, `erasableSyntaxOnly`, `moduleDetection: "force"`, `skipLibCheck` and `types: ["node"]` (Node packages). The Nuxt app sets the same flags in `nuxt.config.ts` except `exactOptionalPropertyTypes`, which conflicts with how Vue templates pass unset props.
 - Node packages (`api`, `worker`, `cli`, `db`, `contracts`) use `"module": "nodenext"` and run with Node's native type stripping. Relative imports therefore need the `.ts` extension, and type-only imports must use `import type`.
 - `erasableSyntaxOnly` rules out **enums, namespaces, parameter properties and decorators**. Use `as const` objects or string-literal unions for enumerated values:
   ```ts
@@ -183,18 +190,21 @@ The code says _what_; a comment says _why_. Default to none.
 - **Drizzle:**
   - Schema is one file per domain in `packages/db/src/schema/`. Define tables with `snakeCase.table(...)` from `drizzle-orm/pg-core` and leave column names out (`text()`, not `text('name')`). Drizzle 1.0 dropped the `casing` option from `drizzle()`.
   - Primary keys are `uuid` (v7) unless a table has a reason to differ. Every table has `createdAt`/`updatedAt` with timezone.
+  - Better Auth tables lack some constraints we rely on (e.g. unique membership). Add them in a custom migration (`db:generate --custom --name <name>`), never in the generated schema.
   - Write relations with `defineRelations`, and build validation schemas with `drizzle-orm/zod` (`createInsertSchema` …), never hand-copied.
   - **Migrations:** run `db:generate`, review the SQL, commit it, then `db:migrate`. Never edit a migration that has already been applied; add a new one instead.
-  - Multi-write use cases run in `db.transaction(async (tx) => …)` and pass `tx` down. Jobs that a transaction triggers are enqueued in the same transaction (outbox) so a rollback drops them too.
+  - Multi-write use cases take a `TransactionScope` (`{ tx, enqueue }`) from `withTransaction` in `apps/api/src/lib/transaction.ts`. Jobs go through `enqueue`, which inserts them on the same transaction (pg-boss `fromDrizzle`) so a rollback drops them too. Read-only helpers take `Queryable` so they work with or without a transaction.
 - **Better Auth:**
   - The single `auth` instance lives in `apps/api/src/lib/auth.ts` and is mounted at `/api/auth/*` after CORS.
   - Generate its tables with `pnpm --filter @entitled/api auth:generate`, which writes `packages/db/src/schema/auth.ts`, then run the normal Drizzle migration flow. Never hand-edit that file; it is excluded from lint and Prettier.
-  - Client accounts are Better Auth organizations. Roles are defined once with `createAccessControl` and checked server-side.
+  - Client accounts are Better Auth organizations (`members.role`: `admin` = client admin, `member` = client user). Vendor staff have `users.vendorRole` (`admin` | `editor` | `support`) and no membership.
+  - Self sign-up is disabled. Users are created only by accepting an invitation (`features/invitations`) or by the `vendor:create-admin` script, both through `createCredentialUser`.
+  - Routes authorize with `requireActor` / `requireVendorRole` from `lib/actor.ts`. Checks that depend on the target object (e.g. client admin of _this_ account) live in the use case, before any data about that object is read.
 - **CI tokens:**
   - Issue them with `@better-auth/api-key`: hashed at rest, prefixed (`ent_`), scoped, with an expiry, and shown only once.
   - They authenticate only the release API scopes they carry. Never accept them for user sessions.
 - **pg-boss:**
-  - Queue names and payload schemas live in `@entitled/contracts/jobs`. The API enqueues and the worker consumes. Handlers parse `job.data` with the schema before using it.
+  - Queue names, payload schemas and queue options live in `@entitled/jobs`. The API enqueues and the worker consumes. Handlers parse `job.data` with the schema before using it.
   - Call `createQueue` for every queue at worker startup, with a `deadLetter` queue and an explicit `retryLimit` and `expireInSeconds`.
   - Handlers take an array of jobs and must be idempotent, because a job can run more than once.
 - **Artifacts:**
@@ -210,6 +220,8 @@ The code says _what_; a comment says _why_. Default to none.
   - Write `<script setup lang="ts">` first, then `<template>`, then `<style>` (rare; prefer Tailwind and Nuxt UI props or `ui` overrides).
   - Declare props with types: `const { size = 'md' } = defineProps<Props>()`.
   - Use `defineModel` for v-model, typed `defineEmits<{ … }>()` and `useTemplateRef`.
+- **Forms:** disable the submit button until hydrated (`useIsHydrated`). A native submit before hydration would put credentials in the URL.
+- **Routing:** `/api/**` always belongs to the API. Caddy routes it there, and Nitro's `server/routes/api/[...path].ts` proxies it in dev and for SSR. Never add Nitro endpoints under `/api`.
 - **Data fetching:**
   - Use `useFetch` / `useAsyncData` for page data in setup, always with an explicit key inside composables. Use `$fetch` only in event handlers.
   - Wrap the API in one typed client composable created with `createUseFetch` (exported from `composables/`), so base URL, auth and error handling live in one place.
@@ -239,7 +251,8 @@ The code says _what_; a comment says _why_. Default to none.
 ## Testing
 
 - Unit-test use cases and pure logic with Vitest. Integration-test API routes against a real Postgres (testcontainers or the compose service) through `app.request()`, not mocks of Drizzle.
-- Nuxt components use `@nuxt/test-utils` (`mountSuspended`). End-to-end tests use Playwright with `goto(url, { waitUntil: 'hydration' })` and role-based locators.
+- API integration tests run against a dedicated `entitled_test` database that `src/test/global-setup.ts` recreates and migrates on every run. Fixtures use unique emails and slugs, so tests never depend on order or clean-up.
+- Nuxt components use `@nuxt/test-utils` (`mountSuspended`). End-to-end tests (`apps/web/test/e2e`) use Playwright with role-based locators, against a running stack with demo data. Wait for a form's submit button to be enabled (hydrated) before typing.
 - Vitest 5 clears mocks by default and fails on unawaited assertions. Don't fight either behaviour.
 - Bug fixes start with a failing test.
 - Test names describe behaviour: `it('hides releases outside the client revision range')`.

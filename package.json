@@ -15,7 +15,9 @@
     "test:e2e": "turbo run test:e2e",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "turbo run lint check-types test && prettier --check ."
+    "check": "turbo run lint check-types test && prettier --check .",
+    "docker:up": "docker compose -f deploy/compose.yaml up -d --build",
+    "docker:down": "docker compose -f deploy/compose.yaml down"
   },
   "devDependencies": {
     "prettier": "catalog:",

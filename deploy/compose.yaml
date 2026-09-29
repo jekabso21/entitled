@@ -1,0 +1,126 @@
+name: entitled
+
+x-server-env: &server-env
+  NODE_ENV: production
+  DATABASE_URL: postgres://entitled:${POSTGRES_PASSWORD}@postgres:5432/entitled
+  API_URL: ${PUBLIC_URL}
+  WEB_URL: ${PUBLIC_URL}
+  PORTAL_NAME: ${PORTAL_NAME:-Entitled}
+  BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?set BETTER_AUTH_SECRET in deploy/.env}
+  S3_ENDPOINT: http://storage:9000
+  S3_REGION: us-east-1
+  S3_BUCKET: ${S3_BUCKET:-entitled-artifacts}
+  S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID}
+  S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY}
+  SMTP_URL: ${SMTP_URL}
+  MAIL_FROM: ${MAIL_FROM}
+
+services:
+  postgres:
+    image: postgres:18.6-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: entitled
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: entitled
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U entitled']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  storage:
+    image: rustfs/rustfs:1.0.3
+    restart: unless-stopped
+    environment:
+      RUSTFS_ACCESS_KEY: ${S3_ACCESS_KEY_ID}
+      RUSTFS_SECRET_KEY: ${S3_SECRET_ACCESS_KEY}
+    volumes:
+      - storage_data:/data
+
+  mailpit:
+    image: axllent/mailpit:v1.31
+    restart: unless-stopped
+    ports:
+      - '8026:8025'
+
+  # One-shot: migrations, bucket, optional demo data. App services wait for it to succeed.
+  init:
+    build: { context: .., dockerfile: deploy/Dockerfile, target: server }
+    image: entitled-server
+    environment:
+      <<: *server-env
+      SEED_DEMO: ${SEED_DEMO:-false}
+      ALLOW_DEMO_SEED: ${SEED_DEMO:-false}
+      DEMO_PASSWORD: ${DEMO_PASSWORD:-entitled-demo-pass}
+    command:
+      - sh
+      - -c
+      - >-
+        node packages/db/src/scripts/migrate.ts &&
+        node apps/api/src/scripts/ensure-bucket.ts &&
+        if [ "$$SEED_DEMO" = "true" ]; then node apps/api/src/scripts/seed-demo.ts; fi
+    depends_on:
+      postgres: { condition: service_healthy }
+      storage: { condition: service_started }
+
+  api:
+    image: entitled-server
+    restart: unless-stopped
+    environment: *server-env
+    command: ['node', 'apps/api/src/main.ts']
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://localhost:3001/api/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      init: { condition: service_completed_successfully }
+
+  worker:
+    image: entitled-server
+    restart: unless-stopped
+    environment: *server-env
+    command: ['node', 'apps/worker/src/main.ts']
+    depends_on:
+      init: { condition: service_completed_successfully }
+
+  web:
+    build: { context: .., dockerfile: deploy/Dockerfile, target: web }
+    image: entitled-web
+    restart: unless-stopped
+    environment:
+      NUXT_API_INTERNAL_URL: http://api:3001
+      NUXT_PUBLIC_PORTAL_NAME: ${PORTAL_NAME:-Entitled}
+    depends_on:
+      api: { condition: service_healthy }
+
+  caddy:
+    image: caddy:2.11.7-alpine
+    restart: unless-stopped
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    ports:
+      - '${HTTP_PORT:-8080}:80'
+      - '${HTTPS_PORT:-8443}:443'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+      - api
+
+volumes:
+  postgres_data:
+  storage_data:
+  caddy_data:
+  caddy_config:

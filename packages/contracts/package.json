@@ -6,8 +6,10 @@
   "exports": {
     "./accounts": "./src/accounts/index.ts",
     "./client-accounts": "./src/client-accounts/index.ts",
+    "./entitlements": "./src/entitlements/index.ts",
     "./errors": "./src/errors/index.ts",
     "./invitations": "./src/invitations/index.ts",
+    "./products": "./src/products/index.ts",
     "./releases": "./src/releases/index.ts"
   },
   "scripts": {

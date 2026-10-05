@@ -4,9 +4,11 @@ import { requestId } from 'hono/request-id'
 import { secureHeaders } from 'hono/secure-headers'
 import { env } from '#config/env.ts'
 import { clientAccountsRouter } from '#features/client-accounts/client-accounts.router.ts'
+import { entitlementsRouter } from '#features/entitlements/entitlements.router.ts'
 import { healthRouter } from '#features/health/health.router.ts'
 import { invitationsRouter } from '#features/invitations/invitations.router.ts'
 import { meRouter } from '#features/me/me.router.ts'
+import { productsRouter } from '#features/products/products.router.ts'
 import { auth } from '#lib/auth.ts'
 import { createRouter } from '#lib/create-router.ts'
 import { handleError, handleNotFound } from '#lib/error-handler.ts'
@@ -27,6 +29,8 @@ export function createApp() {
   app.route('/api', meRouter)
   app.route('/api', clientAccountsRouter)
   app.route('/api', invitationsRouter)
+  app.route('/api', productsRouter)
+  app.route('/api', entitlementsRouter)
 
   app.doc31('/api/openapi.json', {
     openapi: '3.1.0',

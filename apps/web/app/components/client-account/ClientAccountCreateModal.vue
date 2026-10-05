@@ -15,10 +15,7 @@ const toast = useToast()
 watch(
   () => state.name,
   (name) => {
-    state.slug = (name ?? '')
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '')
+    state.slug = toSlug(name ?? '')
   },
 )
 

@@ -4,6 +4,9 @@ import { id, timestamps } from './columns.ts'
 
 export const releaseStatuses = ['draft', 'published', 'archived'] as const
 
+// pending: URL issued, bytes not confirmed. processing: uploaded, checksum running.
+export const artifactStatuses = ['pending', 'processing', 'ready', 'failed'] as const
+
 export const releases = snakeCase.table(
   'releases',
   {
@@ -35,7 +38,11 @@ export const artifacts = snakeCase.table(
     fileName: text().notNull(),
     contentType: text().notNull(),
     sizeBytes: bigint({ mode: 'number' }).notNull(),
-    sha256: text().notNull(),
+    status: text({ enum: artifactStatuses }).notNull().default('pending'),
+    // Computed by the worker from the stored object; null until processing finishes.
+    sha256: text(),
+    // Optional checksum supplied by the uploader; a mismatch marks the artifact failed.
+    expectedSha256: text(),
     storageKey: text().notNull().unique(),
     ...timestamps,
   },

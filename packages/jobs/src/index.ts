@@ -1,3 +1,4 @@
+export * from './artifact-checksum-job.ts'
 export * from './enqueue-job.ts'
 export * from './job-registry.ts'
 export * from './register-queues.ts'

@@ -408,12 +408,21 @@ importers:
 
   apps/worker:
     dependencies:
+      '@aws-sdk/client-s3':
+        specifier: 'catalog:'
+        version: 3.1154.0
+      '@entitled/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@entitled/jobs':
         specifier: workspace:*
         version: link:../../packages/jobs
       '@opentelemetry/api':
         specifier: 'catalog:'
         version: 1.10.0
+      drizzle-orm:
+        specifier: 'catalog:'
+        version: 1.0.0-rc.4(@opentelemetry/api@1.10.0)(@types/pg@8.23.1)(pg@8.23.1)(zod@4.6.7)
       nodemailer:
         specifier: 'catalog:'
         version: 10.1.7
@@ -442,6 +451,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.5(@opentelemetry/api@1.10.0)(@types/node@24.19.2)(vite@8.3.4(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
 
   packages/config-eslint:
     dependencies:

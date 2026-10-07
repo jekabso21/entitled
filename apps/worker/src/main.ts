@@ -1,6 +1,7 @@
-import { registerQueues, sendEmailQueue } from '@entitled/jobs'
+import { artifactChecksumQueue, registerQueues, sendEmailQueue } from '@entitled/jobs'
 import { PgBoss } from 'pg-boss'
 import { env } from '#config/env.ts'
+import { computeArtifactChecksums } from '#handlers/compute-artifact-checksum.ts'
 import { sendEmail } from '#handlers/send-email.ts'
 
 const boss = new PgBoss(env.DATABASE_URL)
@@ -11,6 +12,7 @@ boss.on('error', (err: unknown) => {
 await boss.start()
 await registerQueues(boss)
 await boss.work(sendEmailQueue, sendEmail)
+await boss.work(artifactChecksumQueue, computeArtifactChecksums)
 console.warn('worker started')
 
 for (const signal of ['SIGINT', 'SIGTERM'] as const) {

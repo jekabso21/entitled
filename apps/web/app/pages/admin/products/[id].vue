@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { Product } from '@entitled/contracts/products'
+import type { Release } from '@entitled/contracts/releases'
+import type { TableColumn } from '@nuxt/ui'
 
 definePageMeta({ layout: 'dashboard' })
 
@@ -13,6 +15,23 @@ const { data: product, refresh } = await useFetch<Product>(
     key: `product-${productId.value}`,
   },
 )
+
+const { data: releases } = await useFetch<Release[]>(
+  () => `/api/products/${productId.value}/releases`,
+  { key: `releases-${productId.value}`, default: () => [] },
+)
+
+const releaseColumns: TableColumn<Release>[] = [
+  { accessorKey: 'version', header: 'Version' },
+  { accessorKey: 'title', header: 'Title' },
+  { accessorKey: 'status', header: 'Status' },
+  { id: 'files', header: 'Files', cell: ({ row }) => row.original.artifacts.length },
+  {
+    accessorKey: 'createdAt',
+    header: 'Created',
+    cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString(),
+  },
+]
 
 useSeoMeta({ title: () => product.value?.name ?? 'Product' })
 </script>
@@ -32,7 +51,7 @@ useSeoMeta({ title: () => product.value?.name ?? 'Product' })
       </UDashboardNavbar>
     </template>
     <template #body>
-      <template v-if="product">
+      <div v-if="product" class="space-y-6">
         <p v-if="product.description" class="text-muted">{{ product.description }}</p>
         <UCard>
           <template #header>
@@ -57,7 +76,32 @@ useSeoMeta({ title: () => product.value?.name ?? 'Product' })
           </ul>
           <p v-else class="text-sm text-muted">No revisions yet.</p>
         </UCard>
-      </template>
+        <UCard>
+          <template #header>
+            <div class="flex items-center justify-between">
+              <h2 class="font-semibold text-highlighted">Releases</h2>
+              <ReleaseCreateModal v-if="canEdit" :product-id="product.id" />
+            </div>
+          </template>
+          <UTable :data="releases" :columns="releaseColumns" empty="No releases yet">
+            <template #version-cell="{ row }">
+              <ULink
+                :to="`/admin/releases/${row.original.id}`"
+                class="font-medium text-highlighted"
+              >
+                {{ row.original.version }}
+              </ULink>
+            </template>
+            <template #status-cell="{ row }">
+              <UBadge
+                variant="subtle"
+                :color="releaseStatusColor(row.original.status)"
+                :label="row.original.status"
+              />
+            </template>
+          </UTable>
+        </UCard>
+      </div>
     </template>
   </UDashboardPanel>
 </template>

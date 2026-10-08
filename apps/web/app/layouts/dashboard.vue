@@ -8,6 +8,7 @@ const links: NavigationMenuItem[] = [
   { label: 'Products', icon: 'i-lucide-cpu', to: '/admin/products' },
   { label: 'Client accounts', icon: 'i-lucide-building-2', to: '/admin/client-accounts' },
   { label: 'Invitations', icon: 'i-lucide-mail', to: '/admin/invitations' },
+  { label: 'Settings', icon: 'i-lucide-settings', to: '/admin/settings' },
 ]
 </script>
 

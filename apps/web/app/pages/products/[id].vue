@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Product } from '@entitled/contracts/products'
+import type { Release } from '@entitled/contracts/releases'
 
 definePageMeta({ layout: 'client' })
 
@@ -8,6 +9,11 @@ const productId = computed(() => String(route.params.id))
 const { data: product, error } = await useFetch<Product>(() => `/api/products/${productId.value}`, {
   key: `product-${productId.value}`,
 })
+
+const { data: releases } = await useFetch<Release[]>(
+  () => `/api/products/${productId.value}/releases`,
+  { key: `releases-${productId.value}`, default: () => [] },
+)
 
 useSeoMeta({ title: () => product.value?.name ?? 'Product' })
 </script>
@@ -34,7 +40,11 @@ useSeoMeta({ title: () => product.value?.name ?? 'Product' })
           :label="`Rev ${revision.code} · ${revision.name}`"
         />
       </div>
+      <div v-if="releases.length" class="space-y-4">
+        <ReleaseCard v-for="release in releases" :key="release.id" :release="release" />
+      </div>
       <UEmpty
+        v-else
         icon="i-lucide-cpu"
         title="No releases yet"
         description="Published firmware appears here."

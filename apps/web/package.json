@@ -14,8 +14,11 @@
   },
   "dependencies": {
     "@entitled/contracts": "workspace:*",
+    "@iconify-json/lucide": "catalog:",
     "@nuxt/ui": "catalog:",
+    "@tailwindcss/typography": "catalog:",
     "better-auth": "catalog:",
+    "mermaid": "catalog:",
     "nuxt": "catalog:",
     "tailwindcss": "catalog:",
     "vue": "catalog:",

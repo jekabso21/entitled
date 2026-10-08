@@ -2,7 +2,8 @@ export default defineNuxtConfig({
   modules: ['@nuxt/ui', '@nuxt/eslint'],
   css: ['~/assets/css/main.css'],
   // /api/** belongs to the API service behind Caddy, so the icon endpoint lives elsewhere.
-  icon: { localApiEndpoint: '/_nuxt_icon' },
+  // Icons are bundled so self-hosted installs work without reaching the Iconify API.
+  icon: { localApiEndpoint: '/_nuxt_icon', serverBundle: { collections: ['lucide'] } },
   compatibilityDate: '2026-10-01',
   devtools: { enabled: true },
   runtimeConfig: {

@@ -1,0 +1,35 @@
+{
+  "name": "@entitled/markdown",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/render-markdown.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "check-types": "tsc",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@shikijs/rehype": "catalog:",
+    "hast-util-to-string": "catalog:",
+    "rehype-sanitize": "catalog:",
+    "rehype-stringify": "catalog:",
+    "remark-gfm": "catalog:",
+    "remark-github-blockquote-alert": "catalog:",
+    "remark-parse": "catalog:",
+    "remark-rehype": "catalog:",
+    "shiki": "catalog:",
+    "unified": "catalog:"
+  },
+  "devDependencies": {
+    "@entitled/config-eslint": "workspace:*",
+    "@entitled/config-typescript": "workspace:*",
+    "@types/hast": "catalog:",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -23,12 +23,16 @@ catalog:
   '@better-auth/drizzle-adapter': 1.7.12
   '@eslint/js': ^10.0.1
   '@hono/node-server': ^2.1.5
+  '@iconify-json/lucide': ^1.2.140
   '@hono/zod-openapi': ^1.6.3
   '@nuxt/eslint': ^1.17.0
   '@nuxt/test-utils': ^4.3.4
   '@nuxt/ui': ^4.12.0
   '@opentelemetry/api': ^1.9.0
   '@playwright/test': ^1.64.1
+  '@shikijs/rehype': ^4.5.0
+  '@tailwindcss/typography': ^0.5.20
+  '@types/hast': ^3.0.4
   '@types/node': ^24.19.2
   '@types/nodemailer': ^8.0.2
   '@types/pg': ^8.23.1
@@ -37,22 +41,32 @@ catalog:
   better-auth: 1.7.12
   drizzle-kit: 1.0.0-rc.4
   drizzle-orm: 1.0.0-rc.4
-  eslint: ^10.13.0
   eslint-config-prettier: ^10.1.8
   eslint-plugin-import-x: ^4.17.1
   eslint-plugin-unicorn: ^78.0.0
+  eslint: ^10.13.0
   globals: ^17.13.0
+  hast-util-to-string: ^3.0.1
   hono: ^4.13.13
+  mermaid: ^12.2.0
   nodemailer: ^10.0.0
   nuxt: ^4.6.2
-  pg: ^8.23.1
   pg-boss: ^12.38.0
+  pg: ^8.23.1
   prettier: ^3.9.10
+  rehype-sanitize: ^6.0.0
+  rehype-stringify: ^10.0.1
+  remark-gfm: ^4.0.1
+  remark-github-blockquote-alert: ^2.1.0
+  remark-parse: ^11.0.0
+  remark-rehype: ^11.1.2
+  shiki: ^4.5.0
   tailwindcss: ^4.3.3
   turbo: ^2.11.10
-  typescript: ~6.0.3
   typescript-eslint: ^8.72.0
+  typescript: ~6.0.3
+  unified: ^11.0.5
   vitest: ^5.0.5
-  vue: ^3.5.44
   vue-tsc: ^3.3.13
+  vue: ^3.5.44
   zod: ^4.6.7

@@ -9,6 +9,7 @@
     "./entitlements": "./src/entitlements/index.ts",
     "./errors": "./src/errors/index.ts",
     "./invitations": "./src/invitations/index.ts",
+    "./markdown": "./src/markdown/index.ts",
     "./products": "./src/products/index.ts",
     "./releases": "./src/releases/index.ts",
     "./settings": "./src/settings/index.ts"

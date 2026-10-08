@@ -8,6 +8,7 @@ import { clientAccountsRouter } from '#features/client-accounts/client-accounts.
 import { entitlementsRouter } from '#features/entitlements/entitlements.router.ts'
 import { healthRouter } from '#features/health/health.router.ts'
 import { invitationsRouter } from '#features/invitations/invitations.router.ts'
+import { previewMarkdownRoute } from '#features/markdown/preview-markdown.route.ts'
 import { meRouter } from '#features/me/me.router.ts'
 import { productsRouter } from '#features/products/products.router.ts'
 import { releasesRouter } from '#features/releases/releases.router.ts'
@@ -37,6 +38,7 @@ export function createApp() {
   app.route('/api', releasesRouter)
   app.route('/api', artifactsRouter)
   app.route('/api', settingsRouter)
+  app.route('/api', previewMarkdownRoute)
 
   app.doc31('/api/openapi.json', {
     openapi: '3.1.0',

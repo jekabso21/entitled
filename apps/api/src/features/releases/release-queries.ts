@@ -1,6 +1,7 @@
 import type { Release } from '@entitled/contracts/releases'
 import type { Queryable } from '@entitled/db'
 import type { ProductAccess } from '#lib/product-access.ts'
+import { renderMarkdownCached } from '#lib/markdown.ts'
 import { isReleaseVisible } from '#lib/release-visibility.ts'
 import { toIso } from '#lib/serialize-date.ts'
 
@@ -17,7 +18,7 @@ async function queryReleases(db: Queryable, where: { productId: string } | { id:
 
 type ReleaseRow = Awaited<ReturnType<typeof queryReleases>>[number]
 
-function toRelease(row: ReleaseRow, access: ProductAccess): Release {
+async function toRelease(row: ReleaseRow, access: ProductAccess): Promise<Release> {
   // Clients only ever see files whose checksum is verified.
   const artifacts =
     access.kind === 'all' ? row.artifacts : row.artifacts.filter((a) => a.status === 'ready')
@@ -28,7 +29,9 @@ function toRelease(row: ReleaseRow, access: ProductAccess): Release {
     title: row.title,
     status: row.status,
     changelog: row.changelog,
+    changelogHtml: await renderMarkdownCached(row.changelog),
     installInstructions: row.installInstructions,
+    installInstructionsHtml: await renderMarkdownCached(row.installInstructions),
     minRevisionId: row.minRevisionId,
     maxRevisionId: row.maxRevisionId,
     publishedAt: toIso(row.publishedAt),
@@ -56,7 +59,9 @@ export async function listReleasesForProduct(
   productId: string,
 ) {
   const rows = await queryReleases(db, { productId })
-  return rows.filter((row) => visible(row, access)).map((row) => toRelease(row, access))
+  return Promise.all(
+    rows.filter((row) => visible(row, access)).map((row) => toRelease(row, access)),
+  )
 }
 
 export async function findRelease(db: Queryable, access: ProductAccess, releaseId: string) {

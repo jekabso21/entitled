@@ -25,6 +25,7 @@
     "@entitled/contracts": "workspace:*",
     "@entitled/db": "workspace:*",
     "@entitled/jobs": "workspace:*",
+    "@entitled/markdown": "workspace:*",
     "@hono/node-server": "catalog:",
     "@hono/zod-openapi": "catalog:",
     "better-auth": "catalog:",

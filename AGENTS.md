@@ -187,6 +187,7 @@ The code says _what_; a comment says _why_. Default to none.
   - Write handlers inline in the route file, not in controller classes.
   - Apply `secureHeaders`, `bodyLimit`, `requestId` and a strict CORS allowlist globally.
   - Errors inside `streamSSE` never reach `onError`. Handle them in the stream callback, and stop on `stream.aborted`.
+  - Never give a route a path parameter where a sibling route has a literal segment (`/releases/{id}/{action}` swallowed `/releases/{id}/artifacts`). Spell out each action as its own route.
 - **Drizzle:**
   - Schema is one file per domain in `packages/db/src/schema/`. Define tables with `snakeCase.table(...)` from `drizzle-orm/pg-core` and leave column names out (`text()`, not `text('name')`). Drizzle 1.0 dropped the `casing` option from `drizzle()`.
   - Primary keys are `uuid` (v7) unless a table has a reason to differ. Every table has `createdAt`/`updatedAt` with timezone.
@@ -208,9 +209,10 @@ The code says _what_; a comment says _why_. Default to none.
   - Call `createQueue` for every queue at worker startup, with a `deadLetter` queue and an explicit `retryLimit` and `expireInSeconds`.
   - Handlers take an array of jobs and must be idempotent, because a job can run more than once.
 - **Artifacts:**
-  - Upload directly to S3 through presigned URLs, or through `lib-storage` multipart for API-side streams. Downloads always go through short-lived presigned GET URLs (≤ 15 min), issued only after an entitlement check.
-  - Large files never pass through the API process.
-  - The SHA-256 checksum is computed and stored at upload time. The platform never signs or verifies artifacts.
+  - Upload flow: `POST /releases/{id}/artifacts` returns a presigned PUT, the client PUTs the bytes to storage, then calls `POST /artifacts/{id}/complete`. The API checks the stored size and enqueues `artifact.checksum`, and the worker streams the object to compute SHA-256 (`pending` → `processing` → `ready` | `failed`).
+  - Downloads: `GET /artifacts/{id}/download` checks visibility through `lib/product-access.ts` + `lib/release-visibility.ts`, writes an audit entry, then 302-redirects to a presigned GET (15 min). Clients only ever see `ready` artifacts.
+  - Presigned URLs are signed for `S3_PUBLIC_ENDPOINT` (the host browsers and CI reach); server-to-storage calls use `S3_ENDPOINT`. Because the signature covers the host, a proxy in front of storage must pass the Host header through unchanged.
+  - Large files never pass through the API process. The platform never signs or verifies artifacts.
 
 - **Runtime portability:** API and worker code prefers web-standard APIs (`fetch`, `Request`, `Response`, `crypto.subtle`, web streams) over Node-only modules when one exists. Runtime-specific code (`@hono/node-server`, `node:` imports, `process`) stays in `main.ts`, `config/env.ts` and `lib/` adapters, so the runtime can change (e.g. to Bun) without touching features.
 
@@ -224,7 +226,7 @@ The code says _what_; a comment says _why_. Default to none.
 - **Routing:** `/api/**` always belongs to the API. Caddy routes it there, and Nitro's `server/routes/api/[...path].ts` proxies it in dev and for SSR. Never add Nitro endpoints under `/api`.
 - **Data fetching:**
   - Use `useFetch` / `useAsyncData` for page data in setup, always with an explicit key inside composables. Use `$fetch` only in event handlers.
-  - Wrap the API in one typed client composable created with `createUseFetch` (exported from `composables/`), so base URL, auth and error handling live in one place.
+  - Request paths are same-origin `/api/...`; reuse the contract types (`useFetch<Release[]>`) and keys like `release-${id}` so pages share cached data.
 - **State:**
   - No module-level `ref`s, because they leak state between server requests. Use `useState` for small shared state and a Pinia setup store only for complex domain state.
   - Never store server data in a store when `useFetch` already caches it.
@@ -234,8 +236,9 @@ The code says _what_; a comment says _why_. Default to none.
   - Use only semantic colours (`primary`, `neutral`, …) and `--ui-*` variables, never raw palette classes like `text-blue-600`. Branding swaps those tokens at runtime, which is what makes white-labelling work.
 - **Markdown:**
   - Docs and changelogs are stored as **Markdown text**, never HTML or TipTap JSON, so import and export stay lossless.
-  - Rendering goes through `@entitled/markdown`, and sanitization runs before highlighting.
-  - Mermaid renders on the client from `pre-mermaid` blocks.
+  - The API renders Markdown with `@entitled/markdown` (sanitize, then Shiki) and returns it next to the source (`changelogHtml`). The web app only shows that HTML through `MarkdownContent` and never renders Markdown itself; editors preview via `POST /api/markdown/preview`.
+  - Mermaid fences become `<pre class="mermaid">`, which `MarkdownContent` draws in the browser.
+  - Icons are bundled (`@iconify-json/lucide`) so offline installs never call the Iconify API.
 - **Accessibility:** use semantic elements, give every input a label, keep everything keyboard-reachable, and use role-based selectors in Playwright tests.
 - **Copy:** all user-facing strings go through one i18n layer from the start (English only for now). Don't hard-code vendor names, because the portal is white-label.
 
@@ -254,6 +257,7 @@ The code says _what_; a comment says _why_. Default to none.
 - API integration tests run against a dedicated `entitled_test` database that `src/test/global-setup.ts` recreates and migrates on every run. Fixtures use unique emails and slugs, so tests never depend on order or clean-up.
 - Nuxt components use `@nuxt/test-utils` (`mountSuspended`). End-to-end tests (`apps/web/test/e2e`) use Playwright with role-based locators, against a running stack with demo data. Wait for a form's submit button to be enabled (hydrated) before typing.
 - Vitest 5 clears mocks by default and fails on unawaited assertions. Don't fight either behaviour.
+- Judge `pnpm check` by its exit code, not by scanning output. Suites that render Markdown use a 30 s `testTimeout`, because the first Shiki load is slow under parallel turbo runs.
 - Bug fixes start with a failing test.
 - Test names describe behaviour: `it('hides releases outside the client revision range')`.
 

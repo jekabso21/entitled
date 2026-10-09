@@ -9,3 +9,9 @@
 		reverse_proxy web:3000
 	}
 }
+
+# Presigned artifact URLs point here. Caddy keeps the original Host header, which the
+# S3 signature covers, so this must be the same address as S3_PUBLIC_ENDPOINT.
+{$STORAGE_SITE_ADDRESS::9000} {
+	reverse_proxy storage:9000
+}

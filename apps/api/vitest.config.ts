@@ -13,5 +13,7 @@ export default defineConfig({
     env: { DATABASE_URL: testDatabaseUrl, NODE_ENV: 'test' },
     // Suites share one database; running them in sequence keeps fixtures predictable.
     fileParallelism: false,
+    // The first Markdown render loads Shiki grammars, which is slow on a busy machine.
+    testTimeout: 30_000,
   },
 })

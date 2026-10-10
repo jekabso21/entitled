@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm'
 import { env } from '#config/env.ts'
 import { createCredentialUser } from '#lib/create-credential-user.ts'
 import { db, pool } from '#lib/db.ts'
+import { seedDemoCatalog } from './seed-demo-catalog.ts'
 
 // Demo data for local and Docker previews. Safe to run repeatedly.
 if (env.NODE_ENV === 'production' && process.env.ALLOW_DEMO_SEED !== 'true') {
@@ -46,6 +47,8 @@ await db
     createdAt: new Date(),
   })
   .onConflictDoNothing()
+
+await seedDemoCatalog(db, clientAccountId)
 
 console.warn('demo data ready: admin@entitled.local and client@acme.local')
 await pool.end()

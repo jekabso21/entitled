@@ -1,11 +1,12 @@
 import { expect, test } from '@playwright/test'
-import { clientAdminEmail, signIn, vendorAdminEmail } from './demo-users.ts'
+import { clientAdminState, open, vendorAdminState } from './demo-users.ts'
+
+test.use({ storageState: vendorAdminState })
 
 test('a product granted to Acme shows up for the Acme client admin', async ({ page, browser }) => {
   const name = `Gateway ${String(Date.now())}`
 
-  await signIn(page, vendorAdminEmail)
-  await page.getByRole('link', { name: 'Products' }).click()
+  await open(page, '/admin/products')
   await page.getByRole('button', { name: 'New product' }).click()
   await page.getByLabel('Name').fill(name)
   await page.getByRole('button', { name: 'Create' }).click()
@@ -29,8 +30,8 @@ test('a product granted to Acme shows up for the Acme client admin', async ({ pa
     .filter({ hasText: 'All revisions' })
   await expect(granted).toBeVisible()
 
-  const client = await (await browser.newContext()).newPage()
-  await signIn(client, clientAdminEmail)
+  const client = await (await browser.newContext({ storageState: clientAdminState })).newPage()
+  await open(client, '/')
   await client.getByRole('link', { name }).click()
   await expect(client.getByRole('heading', { name })).toBeVisible()
   await expect(client.getByText('Rev A · First batch')).toBeVisible()

@@ -10,5 +10,13 @@ export default defineConfig({
     baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:3000',
     trace: 'on-first-retry',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    // Signs each demo role in once; production rate limits allow only a few sign-ins per IP.
+    { name: 'setup', testMatch: /auth\.setup\.ts/ },
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+      dependencies: ['setup'],
+    },
+  ],
 })

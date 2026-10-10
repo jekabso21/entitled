@@ -1,11 +1,12 @@
 import { expect, test } from '@playwright/test'
-import { clientAdminEmail, signIn, vendorAdminEmail } from './demo-users.ts'
+import { clientAdminState, open, vendorAdminState } from './demo-users.ts'
+
+test.use({ storageState: vendorAdminState })
 
 test('a published release with a file reaches the entitled client', async ({ page, browser }) => {
   const product = `Sensor ${String(Date.now())}`
 
-  await signIn(page, vendorAdminEmail)
-  await page.getByRole('link', { name: 'Products' }).click()
+  await open(page, '/admin/products')
   await page.getByRole('button', { name: 'New product' }).click()
   await page.getByLabel('Name').fill(product)
   await page.getByRole('button', { name: 'Create' }).click()
@@ -38,8 +39,8 @@ test('a published release with a file reaches the entitled client', async ({ pag
   await page.getByRole('option', { name: product }).click()
   await page.getByRole('button', { name: 'Grant', exact: true }).click()
 
-  const client = await (await browser.newContext()).newPage()
-  await signIn(client, clientAdminEmail)
+  const client = await (await browser.newContext({ storageState: clientAdminState })).newPage()
+  await open(client, '/')
   await client.getByRole('link', { name: product }).click()
   await expect(client.getByRole('heading', { name: 'Highlights' })).toBeVisible()
   await expect(client.locator('pre.shiki')).toBeVisible()

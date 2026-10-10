@@ -1,10 +1,11 @@
 import { expect, test } from '@playwright/test'
-import { clientAdminEmail, signIn, vendorAdminEmail } from './demo-users.ts'
+import { clientAdminState, open, vendorAdminState } from './demo-users.ts'
 import { findInvitationPath } from './mailpit.ts'
 
-test('vendor admin signs in to the dashboard and creates a client account', async ({ page }) => {
-  await signIn(page, vendorAdminEmail)
-  await expect(page).toHaveURL(/\/admin$/)
+test.use({ storageState: vendorAdminState })
+
+test('vendor admin creates a client account from the dashboard', async ({ page }) => {
+  await open(page, '/admin')
   await expect(page.getByText('Welcome back, Vendor Admin')).toBeVisible()
 
   await page.getByRole('link', { name: 'Client accounts' }).click()
@@ -15,11 +16,11 @@ test('vendor admin signs in to the dashboard and creates a client account', asyn
   await expect(page.getByRole('cell', { name })).toBeVisible()
 })
 
-test('client admin sees their products page and cannot open the vendor area', async ({ page }) => {
-  await signIn(page, clientAdminEmail)
-  await expect(page.getByRole('heading', { name: 'Your products' })).toBeVisible()
-  await page.goto('/admin')
+test('client admin cannot open the vendor area', async ({ browser }) => {
+  const page = await (await browser.newContext({ storageState: clientAdminState })).newPage()
+  await open(page, '/admin')
   await expect(page).toHaveURL(/\/$/)
+  await expect(page.getByRole('heading', { name: 'Your products' })).toBeVisible()
 })
 
 test('an invited client user accepts the emailed link and lands in the portal', async ({
@@ -27,8 +28,7 @@ test('an invited client user accepts the emailed link and lands in the portal', 
   browser,
 }) => {
   const email = `invitee-${String(Date.now())}@example.test`
-  await signIn(page, vendorAdminEmail)
-  await page.getByRole('link', { name: 'Client accounts' }).click()
+  await open(page, '/admin/client-accounts')
   await page
     .getByRole('row', { name: /Acme Robotics/ })
     .getByRole('button', { name: 'Invite user' })

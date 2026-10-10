@@ -37,3 +37,24 @@
   align-items: center;
   gap: 0.5rem;
 }
+
+/* Diagrams are drawn by mermaid; they should not sit on the code-block background. */
+.prose pre.mermaid {
+  background: transparent;
+  color: inherit;
+  display: flex;
+  justify-content: center;
+}
+
+/* Typography wraps inline code in literal backticks by default. */
+.prose :where(code):not(:where(pre *))::before,
+.prose :where(code):not(:where(pre *))::after {
+  content: none;
+}
+
+.prose :where(code):not(:where(pre *)) {
+  background: var(--ui-bg-elevated);
+  border-radius: 0.25rem;
+  padding: 0.1rem 0.3rem;
+  font-weight: 500;
+}

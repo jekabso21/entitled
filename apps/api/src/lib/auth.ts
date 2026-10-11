@@ -24,7 +24,13 @@ export const auth = betterAuth({
   plugins: [
     organization({ allowUserToCreateOrganization: false }),
     twoFactor({ issuer: 'Entitled' }),
-    apiKey({ defaultPrefix: 'ent_' }),
+    apiKey({
+      defaultPrefix: 'ent_',
+      // The plugin defaults to 10 requests per day, far too few for a CI pipeline.
+      rateLimit: { enabled: true, timeWindow: 60_000, maxRequests: 120 },
+      keyExpiration: { defaultExpiresIn: null, maxExpiresIn: 365 },
+      permissions: { defaultPermissions: { releases: ['write'] } },
+    }),
   ],
 })
 

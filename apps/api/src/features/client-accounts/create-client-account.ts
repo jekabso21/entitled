@@ -2,7 +2,7 @@ import type { ClientAccount, CreateClientAccountInput } from '@entitled/contract
 import { organizations } from '@entitled/db/schema'
 import { eq } from 'drizzle-orm'
 import type { Actor } from '#lib/actor.ts'
-import { recordAudit } from '#lib/audit.ts'
+import { auditActor, recordAudit } from '#lib/audit.ts'
 import { DomainError } from '#lib/domain-error.ts'
 import type { TransactionScope } from '#lib/transaction.ts'
 
@@ -25,7 +25,7 @@ export async function createClientAccount(
   if (!account) throw new Error('Client account insert returned no row')
 
   await recordAudit(tx, {
-    actorUserId: actor.userId,
+    ...auditActor(actor),
     action: 'client_account.created',
     subjectType: 'client_account',
     subjectId: account.id,

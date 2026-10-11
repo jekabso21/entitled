@@ -3,7 +3,7 @@ import { accountInvitations, members, organizations, users } from '@entitled/db/
 import { and, eq } from 'drizzle-orm'
 import { env } from '#config/env.ts'
 import type { Actor } from '#lib/actor.ts'
-import { recordAudit } from '#lib/audit.ts'
+import { auditActor, recordAudit } from '#lib/audit.ts'
 import { DomainError } from '#lib/domain-error.ts'
 import type { TransactionScope } from '#lib/transaction.ts'
 import { buildInvitationEmail } from './invitation-email.ts'
@@ -41,7 +41,7 @@ export async function createInvitation(
   if (!row) throw new Error('Invitation insert returned no row')
 
   await recordAudit(tx, {
-    actorUserId: actor.userId,
+    ...auditActor(actor),
     action: 'invitation.created',
     subjectType: 'invitation',
     subjectId: row.id,

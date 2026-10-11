@@ -3,6 +3,7 @@ import { cors } from 'hono/cors'
 import { requestId } from 'hono/request-id'
 import { secureHeaders } from 'hono/secure-headers'
 import { env } from '#config/env.ts'
+import { apiKeysRouter } from '#features/api-keys/api-keys.router.ts'
 import { artifactsRouter } from '#features/artifacts/artifacts.router.ts'
 import { clientAccountsRouter } from '#features/client-accounts/client-accounts.router.ts'
 import { entitlementsRouter } from '#features/entitlements/entitlements.router.ts'
@@ -39,7 +40,13 @@ export function createApp() {
   app.route('/api', artifactsRouter)
   app.route('/api', settingsRouter)
   app.route('/api', previewMarkdownRoute)
+  app.route('/api', apiKeysRouter)
 
+  app.openAPIRegistry.registerComponent('securitySchemes', 'apiKey', {
+    type: 'http',
+    scheme: 'bearer',
+    description: 'CI API key (ent_…), accepted by the release and artifact endpoints',
+  })
   app.doc31('/api/openapi.json', {
     openapi: '3.1.0',
     info: { title: 'Entitled API', version: '0.0.0' },

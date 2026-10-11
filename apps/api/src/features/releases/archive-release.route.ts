@@ -21,7 +21,7 @@ const route = createRoute({
 })
 
 export const archiveReleaseRoute = createRouter().openapi(route, async (c) => {
-  const actor = requireVendorRole(c, ['admin', 'editor'])
+  const actor = requireVendorRole(c, ['admin', 'editor'], { allowApiKey: true })
   const { releaseId } = c.req.valid('param')
   await withTransaction((scope) => changeReleaseStatus(scope, actor, releaseId, 'archive'))
   return c.json(await loadReleaseForVendor(releaseId), 200)

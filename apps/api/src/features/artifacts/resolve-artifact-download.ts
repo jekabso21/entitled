@@ -1,7 +1,7 @@
 import type { Queryable } from '@entitled/db'
 import type { Actor } from '#lib/actor.ts'
 import { presignArtifactDownload } from '#lib/artifact-storage.ts'
-import { recordAudit } from '#lib/audit.ts'
+import { auditActor, recordAudit } from '#lib/audit.ts'
 import { DomainError } from '#lib/domain-error.ts'
 import { loadProductAccess } from '#lib/product-access.ts'
 import { isReleaseVisible } from '#lib/release-visibility.ts'
@@ -23,7 +23,7 @@ export async function resolveArtifactDownload(db: Queryable, actor: Actor, artif
   }
 
   await recordAudit(db, {
-    actorUserId: actor.userId,
+    ...auditActor(actor),
     action: 'artifact.downloaded',
     subjectType: 'artifact',
     subjectId: artifact.id,

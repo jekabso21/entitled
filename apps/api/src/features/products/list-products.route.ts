@@ -11,6 +11,7 @@ const route = createRoute({
   path: '/products',
   tags: ['Products'],
   summary: 'Products visible to the caller (all for vendor staff, entitled ones for clients)',
+  request: { query: z.object({ slug: z.string().optional() }) },
   responses: {
     200: {
       description: 'Products',
@@ -20,6 +21,8 @@ const route = createRoute({
 })
 
 export const listProductsRoute = createRouter().openapi(route, async (c) => {
-  const access = await loadProductAccess(db, requireActor(c))
-  return c.json(await listProducts(db, access), 200)
+  const access = await loadProductAccess(db, requireActor(c, { allowApiKey: true }))
+  const { slug } = c.req.valid('query')
+  const products = await listProducts(db, access)
+  return c.json(slug ? products.filter((product) => product.slug === slug) : products, 200)
 })

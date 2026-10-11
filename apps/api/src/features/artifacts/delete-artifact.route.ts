@@ -15,7 +15,7 @@ const route = createRoute({
 })
 
 export const deleteArtifactRoute = createRouter().openapi(route, async (c) => {
-  const actor = requireVendorRole(c, ['admin', 'editor'])
+  const actor = requireVendorRole(c, ['admin', 'editor'], { allowApiKey: true })
   const { artifactId } = c.req.valid('param')
   const storageKey = await withTransaction((scope) => deleteArtifact(scope, actor, artifactId))
   // Deleted after commit: a failure here leaves an orphaned object, never a dangling row.

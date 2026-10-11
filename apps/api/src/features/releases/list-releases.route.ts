@@ -23,7 +23,7 @@ const route = createRoute({
 
 export const listReleasesRoute = createRouter().openapi(route, async (c) => {
   const { productId } = c.req.valid('param')
-  const access = await loadProductAccess(db, requireActor(c))
+  const access = await loadProductAccess(db, requireActor(c, { allowApiKey: true }))
   if (!canSeeProduct(access, productId)) throw new DomainError('not_found', 'Product not found')
   return c.json(await listReleasesForProduct(db, access, productId), 200)
 })

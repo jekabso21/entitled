@@ -23,7 +23,7 @@ const route = createRoute({
 })
 
 export const createReleaseRoute = createRouter().openapi(route, async (c) => {
-  const actor = requireVendorRole(c, ['admin', 'editor'])
+  const actor = requireVendorRole(c, ['admin', 'editor'], { allowApiKey: true })
   const input = c.req.valid('json')
   const releaseId = await withTransaction((scope) => createRelease(scope, actor, input))
   return c.json(await loadReleaseForVendor(releaseId), 201)

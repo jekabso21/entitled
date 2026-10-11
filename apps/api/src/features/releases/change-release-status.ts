@@ -1,7 +1,7 @@
 import { artifacts, releases } from '@entitled/db/schema'
 import { and, eq, inArray } from 'drizzle-orm'
 import type { Actor } from '#lib/actor.ts'
-import { recordAudit } from '#lib/audit.ts'
+import { auditActor, recordAudit } from '#lib/audit.ts'
 import { DomainError } from '#lib/domain-error.ts'
 import type { TransactionScope } from '#lib/transaction.ts'
 
@@ -43,7 +43,7 @@ export async function changeReleaseStatus(
     .set({ status: to, ...(action === 'publish' ? { publishedAt: new Date() } : {}) })
     .where(eq(releases.id, releaseId))
   await recordAudit(tx, {
-    actorUserId: actor.userId,
+    ...auditActor(actor),
     action: `release.${to}`,
     subjectType: 'release',
     subjectId: releaseId,

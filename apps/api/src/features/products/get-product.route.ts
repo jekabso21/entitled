@@ -19,7 +19,7 @@ const route = createRoute({
 })
 
 export const getProductRoute = createRouter().openapi(route, async (c) => {
-  const access = await loadProductAccess(db, requireActor(c))
+  const access = await loadProductAccess(db, requireActor(c, { allowApiKey: true }))
   const product = await findProduct(db, access, c.req.valid('param').productId)
   // Not-entitled and missing look identical, so ids cannot be probed.
   if (!product) throw new DomainError('not_found', 'Product not found')

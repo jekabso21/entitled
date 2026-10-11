@@ -20,7 +20,7 @@ const route = createRoute({
 })
 
 export const completeArtifactUploadRoute = createRouter().openapi(route, async (c) => {
-  requireVendorRole(c, ['admin', 'editor'])
+  requireVendorRole(c, ['admin', 'editor'], { allowApiKey: true })
   const { artifactId } = c.req.valid('param')
   const status = await withTransaction((scope) => completeArtifactUpload(scope, artifactId))
   return c.json({ status }, 200)

@@ -3,7 +3,7 @@ import { artifacts, releases } from '@entitled/db/schema'
 import { eq } from 'drizzle-orm'
 import type { Actor } from '#lib/actor.ts'
 import { artifactStorageKey, presignArtifactUpload } from '#lib/artifact-storage.ts'
-import { recordAudit } from '#lib/audit.ts'
+import { auditActor, recordAudit } from '#lib/audit.ts'
 import { DomainError } from '#lib/domain-error.ts'
 import { toIso } from '#lib/serialize-date.ts'
 import type { TransactionScope } from '#lib/transaction.ts'
@@ -40,7 +40,7 @@ export async function createArtifactUpload(
   if (!artifact) throw new Error('Artifact insert returned no row')
 
   await recordAudit(tx, {
-    actorUserId: actor.userId,
+    ...auditActor(actor),
     action: 'artifact.upload_started',
     subjectType: 'release',
     subjectId: releaseId,

@@ -19,7 +19,7 @@ const route = createRoute({
 })
 
 export const getReleaseRoute = createRouter().openapi(route, async (c) => {
-  const access = await loadProductAccess(db, requireActor(c))
+  const access = await loadProductAccess(db, requireActor(c, { allowApiKey: true }))
   const release = await findRelease(db, access, c.req.valid('param').releaseId)
   if (!release) throw new DomainError('not_found', 'Release not found')
   return c.json(release, 200)

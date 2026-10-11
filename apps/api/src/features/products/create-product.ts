@@ -2,7 +2,7 @@ import type { CreateProductInput, Product } from '@entitled/contracts/products'
 import { products } from '@entitled/db/schema'
 import { eq } from 'drizzle-orm'
 import type { Actor } from '#lib/actor.ts'
-import { recordAudit } from '#lib/audit.ts'
+import { auditActor, recordAudit } from '#lib/audit.ts'
 import { DomainError } from '#lib/domain-error.ts'
 import type { TransactionScope } from '#lib/transaction.ts'
 
@@ -21,7 +21,7 @@ export async function createProduct(
   if (!product) throw new Error('Product insert returned no row')
 
   await recordAudit(tx, {
-    actorUserId: actor.userId,
+    ...auditActor(actor),
     action: 'product.created',
     subjectType: 'product',
     subjectId: product.id,

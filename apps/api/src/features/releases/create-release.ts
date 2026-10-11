@@ -2,7 +2,7 @@ import type { CreateReleaseInput } from '@entitled/contracts/releases'
 import { products, releases } from '@entitled/db/schema'
 import { and, eq } from 'drizzle-orm'
 import type { Actor } from '#lib/actor.ts'
-import { recordAudit } from '#lib/audit.ts'
+import { auditActor, recordAudit } from '#lib/audit.ts'
 import { DomainError } from '#lib/domain-error.ts'
 import { getInstallSettings } from '#lib/install-settings.ts'
 import type { TransactionScope } from '#lib/transaction.ts'
@@ -39,7 +39,7 @@ export async function createRelease(
   if (!release) throw new Error('Release insert returned no row')
 
   await recordAudit(tx, {
-    actorUserId: actor.userId,
+    ...auditActor(actor),
     action: release.status === 'published' ? 'release.created_published' : 'release.created',
     subjectType: 'release',
     subjectId: release.id,

@@ -204,6 +204,10 @@ The code says _what_; a comment says _why_. Default to none.
 - **CI tokens:**
   - Issue them with `@better-auth/api-key`: hashed at rest, prefixed (`ent_`), scoped, with an expiry, and shown only once.
   - They authenticate only the release API scopes they carry. Never accept them for user sessions.
+  - The session middleware accepts `Authorization: Bearer ent_…` or `x-api-key`. A key acts as its owner (`Actor.apiKeyId` set) and stops working when the owner is no longer vendor admin or editor.
+  - Routes opt in with `requireActor(c, { allowApiKey: true })` / `requireVendorRole(c, roles, { allowApiKey: true })`. Every other route rejects keys with 403, so key management, accounts and entitlements stay session-only.
+  - Audit entries spread `auditActor(actor)` so `actorApiKeyId` is recorded alongside the owner.
+  - The CI script lives at `apps/web/public/ci/entitled-release.sh` (served at `/ci/entitled-release.sh`; POSIX sh + curl + jq). It must stay ShellCheck-clean and work in `alpine` with `curl jq coreutils`.
 - **pg-boss:**
   - Queue names, payload schemas and queue options live in `@entitled/jobs`. The API enqueues and the worker consumes. Handlers parse `job.data` with the schema before using it.
   - Call `createQueue` for every queue at worker startup, with a `deadLetter` queue and an explicit `retryLimit` and `expireInSeconds`.

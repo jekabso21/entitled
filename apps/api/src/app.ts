@@ -4,6 +4,7 @@ import { requestId } from 'hono/request-id'
 import { secureHeaders } from 'hono/secure-headers'
 import { env } from '#config/env.ts'
 import { apiKeysRouter } from '#features/api-keys/api-keys.router.ts'
+import { listAuditEntriesRoute } from '#features/audit/list-audit-entries.route.ts'
 import { artifactsRouter } from '#features/artifacts/artifacts.router.ts'
 import { clientAccountsRouter } from '#features/client-accounts/client-accounts.router.ts'
 import { entitlementsRouter } from '#features/entitlements/entitlements.router.ts'
@@ -41,6 +42,7 @@ export function createApp() {
   app.route('/api', settingsRouter)
   app.route('/api', previewMarkdownRoute)
   app.route('/api', apiKeysRouter)
+  app.route('/api', listAuditEntriesRoute)
 
   app.openAPIRegistry.registerComponent('securitySchemes', 'apiKey', {
     type: 'http',

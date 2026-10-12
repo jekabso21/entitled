@@ -21,6 +21,7 @@
     "mermaid": "catalog:",
     "nuxt": "catalog:",
     "tailwindcss": "catalog:",
+    "uqr": "catalog:",
     "vue": "catalog:",
     "zod": "catalog:"
   },

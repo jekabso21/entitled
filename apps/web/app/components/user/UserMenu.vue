@@ -8,6 +8,13 @@ const signOut = useSignOut()
 
 const items = computed<DropdownMenuItem[][]>(() => [
   [{ label: user.value?.email ?? '', type: 'label' }],
+  [
+    {
+      label: 'Security',
+      icon: 'i-lucide-shield-check',
+      to: user.value?.vendorRole ? '/admin/security' : '/account/security',
+    },
+  ],
   [{ label: 'Sign out', icon: 'i-lucide-log-out', onSelect: () => void signOut() }],
 ])
 </script>

@@ -305,6 +305,9 @@ catalogs:
     unified:
       specifier: ^11.0.5
       version: 11.0.5
+    uqr:
+      specifier: ^0.1.3
+      version: 0.1.3
     vitest:
       specifier: ^5.0.5
       version: 5.0.5
@@ -431,6 +434,9 @@ importers:
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.3
+      uqr:
+        specifier: 'catalog:'
+        version: 0.1.3
       vue:
         specifier: 'catalog:'
         version: 3.5.44(typescript@6.0.3)

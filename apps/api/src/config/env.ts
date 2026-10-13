@@ -7,7 +7,6 @@ const envSchema = z.object({
   API_URL: z.url(),
   WEB_URL: z.url(),
   BETTER_AUTH_SECRET: z.string().min(32),
-  PORTAL_NAME: z.string().min(1).default('Entitled'),
   S3_ENDPOINT: z.url(),
   // Host browsers and CI use for presigned URLs; defaults to S3_ENDPOINT when storage is reachable directly.
   S3_PUBLIC_ENDPOINT: z.url().optional(),

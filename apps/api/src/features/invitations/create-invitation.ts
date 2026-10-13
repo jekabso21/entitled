@@ -5,6 +5,7 @@ import { env } from '#config/env.ts'
 import type { Actor } from '#lib/actor.ts'
 import { auditActor, recordAudit } from '#lib/audit.ts'
 import { DomainError } from '#lib/domain-error.ts'
+import { getBranding } from '#lib/install-settings.ts'
 import type { TransactionScope } from '#lib/transaction.ts'
 import { buildInvitationEmail } from './invitation-email.ts'
 import { toInvitation } from './invitation-queries.ts'
@@ -53,7 +54,7 @@ export async function createInvitation(
     .from(users)
     .where(eq(users.id, actor.userId))
   const email = buildInvitationEmail({
-    portalName: env.PORTAL_NAME,
+    portalName: (await getBranding(tx)).portalName,
     inviterName: inviter?.name ?? 'An administrator',
     accountName,
     link: new URL(`/invite/${token}`, env.WEB_URL).toString(),

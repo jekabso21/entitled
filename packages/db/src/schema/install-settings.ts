@@ -1,5 +1,15 @@
 import { sql } from 'drizzle-orm'
-import { boolean, check, integer, snakeCase, timestamp } from 'drizzle-orm/pg-core'
+import {
+  boolean,
+  check,
+  customType,
+  integer,
+  snakeCase,
+  text,
+  timestamp,
+} from 'drizzle-orm/pg-core'
+
+const bytea = customType<{ data: Buffer }>({ dataType: () => 'bytea' })
 
 // Single-row table: one install serves one vendor.
 export const installSettings = snakeCase.table(
@@ -7,6 +17,11 @@ export const installSettings = snakeCase.table(
   {
     id: integer().primaryKey().default(1),
     autoPublishReleases: boolean().notNull().default(false),
+    portalName: text().notNull().default('Entitled'),
+    primaryColor: text().notNull().default('indigo'),
+    // Small images only (capped by the API); kept in Postgres so backups include branding.
+    logo: bytea(),
+    logoContentType: text(),
     updatedAt: timestamp({ withTimezone: true })
       .notNull()
       .defaultNow()

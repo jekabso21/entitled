@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const { public: config } = useRuntimeConfig()
 const { data: user } = useCurrentUser()
 const isClientAdmin = computed(
   () => user.value?.memberships.some((membership) => membership.role === 'admin') ?? false,
@@ -10,7 +9,7 @@ const isClientAdmin = computed(
   <div class="min-h-dvh bg-default">
     <header class="border-b border-default">
       <UContainer class="flex h-14 items-center justify-between gap-4">
-        <NuxtLink to="/" class="font-semibold text-highlighted">{{ config.portalName }}</NuxtLink>
+        <NuxtLink to="/"><BrandMark /></NuxtLink>
         <nav class="flex items-center gap-1">
           <UButton to="/" label="Products" variant="ghost" color="neutral" />
           <UButton

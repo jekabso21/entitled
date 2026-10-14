@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
 
-const { public: config } = useRuntimeConfig()
-
 const links: NavigationMenuItem[] = [
   { label: 'Overview', icon: 'i-lucide-layout-dashboard', to: '/admin', exact: true },
   { label: 'Products', icon: 'i-lucide-cpu', to: '/admin/products' },
@@ -16,12 +14,9 @@ const links: NavigationMenuItem[] = [
 
 <template>
   <UDashboardGroup>
-    <UDashboardSidebar collapsible resizable>
+    <UDashboardSidebar id="main" collapsible resizable>
       <template #header="{ collapsed }">
-        <span v-if="!collapsed" class="truncate font-semibold text-highlighted">
-          {{ config.portalName }}
-        </span>
-        <UIcon v-else name="i-lucide-box" class="mx-auto size-5" />
+        <BrandMark :compact="collapsed" :class="collapsed ? 'mx-auto' : ''" />
       </template>
       <template #default="{ collapsed }">
         <UNavigationMenu :collapsed="collapsed" :items="links" orientation="vertical" />

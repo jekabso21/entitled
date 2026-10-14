@@ -9,9 +9,6 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // Where server-side rendering reaches the API; browsers go through the same origin.
     apiInternalUrl: 'http://localhost:3001',
-    public: {
-      portalName: 'Entitled',
-    },
   },
   typescript: {
     tsConfig: {

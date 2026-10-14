@@ -33,15 +33,18 @@ useSeoMeta({ title: 'Settings' })
       </UDashboardNavbar>
     </template>
     <template #body>
-      <UCard v-if="settings" class="max-w-2xl">
-        <USwitch
-          :model-value="settings.autoPublishReleases"
-          :disabled="!isAdmin"
-          label="Publish new releases immediately"
-          description="When off, releases (including those from CI) land as drafts until someone publishes them."
-          @update:model-value="update({ autoPublishReleases: $event })"
-        />
-      </UCard>
+      <div class="max-w-2xl space-y-6">
+        <BrandingSettings v-if="isAdmin" />
+        <UCard v-if="settings">
+          <USwitch
+            :model-value="settings.autoPublishReleases"
+            :disabled="!isAdmin"
+            label="Publish new releases immediately"
+            description="When off, releases (including those from CI) land as drafts until someone publishes them."
+            @update:model-value="update({ autoPublishReleases: $event })"
+          />
+        </UCard>
+      </div>
     </template>
   </UDashboardPanel>
 </template>

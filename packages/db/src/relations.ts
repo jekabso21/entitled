@@ -24,6 +24,27 @@ const domainRelations = defineRelations(schema, (r) => ({
       to: r.organizations.id,
     }),
   },
+  supportThreads: {
+    clientAccount: r.one.organizations({
+      from: r.supportThreads.clientAccountId,
+      to: r.organizations.id,
+    }),
+    product: r.one.products({ from: r.supportThreads.productId, to: r.products.id }),
+    release: r.one.releases({ from: r.supportThreads.releaseId, to: r.releases.id }),
+    createdBy: r.one.users({ from: r.supportThreads.createdByUserId, to: r.users.id }),
+    messages: r.many.supportMessages(),
+  },
+  supportMessages: {
+    thread: r.one.supportThreads({ from: r.supportMessages.threadId, to: r.supportThreads.id }),
+    author: r.one.users({ from: r.supportMessages.authorUserId, to: r.users.id }),
+    attachments: r.many.supportAttachments(),
+  },
+  supportAttachments: {
+    message: r.one.supportMessages({
+      from: r.supportAttachments.messageId,
+      to: r.supportMessages.id,
+    }),
+  },
   entitlements: {
     clientAccount: r.one.organizations({
       from: r.entitlements.clientAccountId,

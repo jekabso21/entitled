@@ -125,7 +125,7 @@ apps/web/
   shared/             code used by both app/ and server/ (no Vue, no Nitro imports)
 ```
 
-- Nuxt builds component names from the folder path (`components/release/Card.vue` becomes `<ReleaseCard>`). Name the file after the full tag: `components/release/ReleaseCard.vue`.
+- Nuxt builds component names from the folder path (`components/release/Card.vue` becomes `<ReleaseCard>`). Name the file after the full tag: `components/release/ReleaseCard.vue`. The folder must be the tag's first word exactly: `brand/BrandingSettings.vue` registers as `<BrandBrandingSettings>`, so it belongs in `branding/`. A misnamed component renders as nothing on the server and breaks hydration.
 - Never edit the generated root `tsconfig.json`. Tune TypeScript through `typescript.tsConfig` in `nuxt.config.ts`.
 
 ## Coding standards
@@ -244,6 +244,8 @@ The code says _what_; a comment says _why_. Default to none.
   - Mermaid fences become `<pre class="mermaid">`, which `MarkdownContent` draws in the browser.
   - Icons are bundled (`@iconify-json/lucide`) so offline installs never call the Iconify API.
 - **Accessibility:** use semantic elements, give every input a label, keep everything keyboard-reachable, and use role-based selectors in Playwright tests.
+- **Dates:** render with `formatDate` / `formatDateTime` (ISO, UTC). `toLocale*()` differs between server and browser and breaks hydration.
+- **Branding:** read portal name, colour and logo through `useBranding()`; the `branding` plugin applies the colour with `updateAppConfig` before first render. Never hard-code the portal name.
 - **Copy:** all user-facing strings go through one i18n layer from the start (English only for now). Don't hard-code vendor names, because the portal is white-label.
 
 ## Domain rules agents must not break

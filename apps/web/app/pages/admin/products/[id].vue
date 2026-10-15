@@ -29,7 +29,7 @@ const releaseColumns: TableColumn<Release>[] = [
   {
     accessorKey: 'createdAt',
     header: 'Created',
-    cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString(),
+    cell: ({ row }) => dateCell(row.original.createdAt),
   },
 ]
 

@@ -14,7 +14,6 @@ const { data: keys, refresh } = await useFetch<ApiKey[]>('/api/api-keys', {
 const toast = useToast()
 const requestUrl = useRequestURL()
 
-const formatDate = (value: string | null) => (value ? new Date(value).toLocaleDateString() : '—')
 const columns: TableColumn<ApiKey>[] = [
   { accessorKey: 'name', header: 'Name' },
   { accessorKey: 'start', header: 'Key', cell: ({ row }) => `${row.original.start ?? ''}…` },
@@ -22,12 +21,12 @@ const columns: TableColumn<ApiKey>[] = [
   {
     accessorKey: 'lastUsedAt',
     header: 'Last used',
-    cell: ({ row }) => formatDate(row.original.lastUsedAt),
+    cell: ({ row }) => dateCell(row.original.lastUsedAt),
   },
   {
     accessorKey: 'expiresAt',
     header: 'Expires',
-    cell: ({ row }) => formatDate(row.original.expiresAt),
+    cell: ({ row }) => dateCell(row.original.expiresAt),
   },
   { id: 'actions', header: '' },
 ]

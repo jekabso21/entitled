@@ -2,10 +2,6 @@
 import type { Release } from '@entitled/contracts/releases'
 
 const { release } = defineProps<{ release: Release }>()
-
-const publishedOn = computed(() =>
-  release.publishedAt ? new Date(release.publishedAt).toLocaleDateString() : '',
-)
 </script>
 
 <template>
@@ -16,9 +12,12 @@ const publishedOn = computed(() =>
           {{ release.version }}
           <span v-if="release.title" class="font-normal text-muted">· {{ release.title }}</span>
         </h2>
-        <time class="text-sm text-muted" :datetime="release.publishedAt ?? undefined">{{
-          publishedOn
-        }}</time>
+        <time
+          v-if="release.publishedAt"
+          class="text-sm text-muted"
+          :datetime="release.publishedAt"
+          >{{ formatDate(release.publishedAt) }}</time
+        >
       </div>
     </template>
     <div class="space-y-6">

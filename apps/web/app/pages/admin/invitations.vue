@@ -38,7 +38,7 @@ const columns: TableColumn<Invitation>[] = [
   {
     accessorKey: 'expiresAt',
     header: 'Expires',
-    cell: ({ row }) => new Date(row.original.expiresAt).toLocaleDateString(),
+    cell: ({ row }) => dateCell(row.original.expiresAt),
   },
 ]
 

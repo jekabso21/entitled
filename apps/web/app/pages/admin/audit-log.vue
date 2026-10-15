@@ -53,7 +53,7 @@ const columns: TableColumn<AuditEntry>[] = [
   {
     accessorKey: 'createdAt',
     header: 'When',
-    cell: ({ row }) => new Date(row.original.createdAt).toLocaleString(),
+    cell: ({ row }) => dateCell(row.original.createdAt, true),
   },
   { accessorKey: 'action', header: 'Action' },
   { accessorKey: 'actorEmail', header: 'Who' },

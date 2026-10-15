@@ -18,7 +18,7 @@ const columns: TableColumn<ClientAccount>[] = [
   {
     accessorKey: 'createdAt',
     header: 'Created',
-    cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString(),
+    cell: ({ row }) => dateCell(row.original.createdAt),
   },
   { id: 'actions', header: '' },
 ]

@@ -14,7 +14,8 @@
     "./markdown": "./src/markdown/index.ts",
     "./products": "./src/products/index.ts",
     "./releases": "./src/releases/index.ts",
-    "./settings": "./src/settings/index.ts"
+    "./settings": "./src/settings/index.ts",
+    "./support": "./src/support/index.ts"
   },
   "scripts": {
     "lint": "eslint .",

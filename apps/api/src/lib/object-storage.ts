@@ -15,7 +15,11 @@ export function artifactStorageKey(releaseId: string, artifactId: string, fileNa
   return `releases/${releaseId}/${artifactId}/${fileName}`
 }
 
-export async function presignArtifactUpload(key: string, contentType: string, sizeBytes: number) {
+export function supportAttachmentStorageKey(attachmentId: string, fileName: string) {
+  return `support/${attachmentId}/${fileName}`
+}
+
+export async function presignUpload(key: string, contentType: string, sizeBytes: number) {
   const command = new PutObjectCommand({
     Bucket: env.S3_BUCKET,
     Key: key,
@@ -29,7 +33,7 @@ export async function presignArtifactUpload(key: string, contentType: string, si
   return { url, headers: { 'content-type': contentType } }
 }
 
-export async function presignArtifactDownload(key: string, fileName: string) {
+export async function presignDownload(key: string, fileName: string) {
   const command = new GetObjectCommand({
     Bucket: env.S3_BUCKET,
     Key: key,

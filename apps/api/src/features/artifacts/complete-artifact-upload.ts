@@ -1,6 +1,6 @@
 import { artifacts } from '@entitled/db/schema'
 import { eq } from 'drizzle-orm'
-import { storedObjectSize } from '#lib/artifact-storage.ts'
+import { storedObjectSize } from '#lib/object-storage.ts'
 import { DomainError } from '#lib/domain-error.ts'
 import type { TransactionScope } from '#lib/transaction.ts'
 

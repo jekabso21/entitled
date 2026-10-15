@@ -4,7 +4,7 @@ import type { Db } from '@entitled/db'
 import { artifacts, entitlements, hardwareRevisions, products, releases } from '@entitled/db/schema'
 import { eq } from 'drizzle-orm'
 import { env } from '#config/env.ts'
-import { artifactStorageKey } from '#lib/artifact-storage.ts'
+import { artifactStorageKey } from '#lib/object-storage.ts'
 import { s3 } from '#lib/s3-client.ts'
 
 const changelog = `## Highlights

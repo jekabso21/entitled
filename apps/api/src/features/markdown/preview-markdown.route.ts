@@ -1,6 +1,6 @@
 import { markdownPreviewInputSchema, markdownPreviewSchema } from '@entitled/contracts/markdown'
 import { createRoute } from '@hono/zod-openapi'
-import { requireVendorRole } from '#lib/actor.ts'
+import { requireActor } from '#lib/actor.ts'
 import { createRouter } from '#lib/create-router.ts'
 import { renderMarkdownCached } from '#lib/markdown.ts'
 
@@ -8,7 +8,7 @@ const route = createRoute({
   method: 'post',
   path: '/markdown/preview',
   tags: ['Markdown'],
-  summary: 'Render Markdown exactly as clients will see it (vendor staff)',
+  summary: 'Render Markdown exactly as it will be shown (any signed-in user)',
   request: {
     body: {
       required: true,
@@ -24,6 +24,6 @@ const route = createRoute({
 })
 
 export const previewMarkdownRoute = createRouter().openapi(route, async (c) => {
-  requireVendorRole(c, ['admin', 'editor', 'support'])
+  requireActor(c)
   return c.json({ html: await renderMarkdownCached(c.req.valid('json').markdown) }, 200)
 })

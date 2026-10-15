@@ -1,6 +1,6 @@
 import { createRoute, z } from '@hono/zod-openapi'
 import { requireVendorRole } from '#lib/actor.ts'
-import { deleteStoredObject } from '#lib/artifact-storage.ts'
+import { deleteStoredObject } from '#lib/object-storage.ts'
 import { createRouter } from '#lib/create-router.ts'
 import { withTransaction } from '#lib/transaction.ts'
 import { deleteArtifact } from './delete-artifact.ts'

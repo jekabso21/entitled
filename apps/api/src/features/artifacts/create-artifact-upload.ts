@@ -2,7 +2,7 @@ import type { ArtifactUpload, CreateArtifactUploadInput } from '@entitled/contra
 import { artifacts, releases } from '@entitled/db/schema'
 import { eq } from 'drizzle-orm'
 import type { Actor } from '#lib/actor.ts'
-import { artifactStorageKey, presignArtifactUpload } from '#lib/artifact-storage.ts'
+import { artifactStorageKey, presignUpload } from '#lib/object-storage.ts'
 import { auditActor, recordAudit } from '#lib/audit.ts'
 import { DomainError } from '#lib/domain-error.ts'
 import { toIso } from '#lib/serialize-date.ts'
@@ -47,7 +47,7 @@ export async function createArtifactUpload(
     metadata: { artifactId: id, fileName: input.fileName, sizeBytes: input.sizeBytes },
   })
 
-  const upload = await presignArtifactUpload(storageKey, input.contentType, input.sizeBytes)
+  const upload = await presignUpload(storageKey, input.contentType, input.sizeBytes)
   return {
     artifact: {
       id: artifact.id,

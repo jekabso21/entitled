@@ -1,6 +1,6 @@
 import type { Queryable } from '@entitled/db'
 import type { Actor } from '#lib/actor.ts'
-import { presignArtifactDownload } from '#lib/artifact-storage.ts'
+import { presignDownload } from '#lib/object-storage.ts'
 import { auditActor, recordAudit } from '#lib/audit.ts'
 import { DomainError } from '#lib/domain-error.ts'
 import { loadProductAccess } from '#lib/product-access.ts'
@@ -29,5 +29,5 @@ export async function resolveArtifactDownload(db: Queryable, actor: Actor, artif
     subjectId: artifact.id,
     metadata: { releaseId: release.id, version: release.version, fileName: artifact.fileName },
   })
-  return presignArtifactDownload(artifact.storageKey, artifact.fileName)
+  return presignDownload(artifact.storageKey, artifact.fileName)
 }

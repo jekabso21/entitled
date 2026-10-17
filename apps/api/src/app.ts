@@ -16,6 +16,7 @@ import { meRouter } from '#features/me/me.router.ts'
 import { productsRouter } from '#features/products/products.router.ts'
 import { releasesRouter } from '#features/releases/releases.router.ts'
 import { settingsRouter } from '#features/settings/settings.router.ts'
+import { supportRouter } from '#features/support/support.router.ts'
 import { auth } from '#lib/auth.ts'
 import { createRouter } from '#lib/create-router.ts'
 import { handleError, handleNotFound } from '#lib/error-handler.ts'
@@ -45,6 +46,7 @@ export function createApp() {
   app.route('/api', apiKeysRouter)
   app.route('/api', listAuditEntriesRoute)
   app.route('/api', brandingRouter)
+  app.route('/api', supportRouter)
 
   app.openAPIRegistry.registerComponent('securitySchemes', 'apiKey', {
     type: 'http',

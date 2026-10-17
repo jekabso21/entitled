@@ -12,6 +12,7 @@ const isClientAdmin = computed(
         <NuxtLink to="/"><BrandMark /></NuxtLink>
         <nav class="flex items-center gap-1">
           <UButton to="/" label="Products" variant="ghost" color="neutral" />
+          <UButton to="/support" label="Support" variant="ghost" color="neutral" />
           <UButton
             v-if="isClientAdmin"
             to="/account/team"

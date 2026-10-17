@@ -20,13 +20,22 @@ useSeoMeta({ title: () => product.value?.name ?? 'Product' })
 
 <template>
   <div class="space-y-6">
-    <UButton
-      icon="i-lucide-arrow-left"
-      variant="link"
-      color="neutral"
-      to="/"
-      label="All products"
-    />
+    <div class="flex items-center justify-between gap-4">
+      <UButton
+        icon="i-lucide-arrow-left"
+        variant="link"
+        color="neutral"
+        to="/"
+        label="All products"
+      />
+      <UButton
+        v-if="product"
+        :to="{ path: '/support/new', query: { product: product.id } }"
+        icon="i-lucide-life-buoy"
+        variant="soft"
+        label="Get support"
+      />
+    </div>
     <template v-if="product">
       <div class="space-y-1">
         <h1 class="text-2xl font-semibold text-highlighted">{{ product.name }}</h1>

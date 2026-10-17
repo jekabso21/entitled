@@ -8,6 +8,7 @@
     "./api-keys": "./src/api-keys/index.ts",
     "./audit": "./src/audit/index.ts",
     "./client-accounts": "./src/client-accounts/index.ts",
+    "./docs": "./src/docs/index.ts",
     "./entitlements": "./src/entitlements/index.ts",
     "./errors": "./src/errors/index.ts",
     "./invitations": "./src/invitations/index.ts",

@@ -29,4 +29,14 @@ describe('renderMarkdown', () => {
     const html = await renderMarkdown('> [!WARNING]\n> Do not unplug during flashing.')
     expect(html).toContain('markdown-alert-warning')
   })
+
+  it('renders images that point at videos as playable video elements', async () => {
+    const html = await renderMarkdown('![Flashing demo](/api/doc-assets/1/flash.mp4)')
+    expect(html).toContain('<video src="/api/doc-assets/1/flash.mp4" controls')
+  })
+
+  it('does not turn javascript: URLs into videos', async () => {
+    const html = await renderMarkdown('![x](javascript:alert(1)//.mp4)')
+    expect(html).not.toContain('javascript:')
+  })
 })

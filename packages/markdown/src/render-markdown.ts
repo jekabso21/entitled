@@ -7,6 +7,7 @@ import remarkParse from 'remark-parse'
 import remarkRehype from 'remark-rehype'
 import { unified } from 'unified'
 import { rehypeMermaidBlocks } from './rehype-mermaid-blocks.ts'
+import { rehypeVideoEmbeds } from './rehype-video-embeds.ts'
 import { sanitizeSchema } from './sanitize-schema.ts'
 
 // Sanitize runs before highlighting so Shiki's trusted inline styles survive,
@@ -18,6 +19,7 @@ const processor = unified()
   .use(remarkRehype)
   .use(rehypeSanitize, sanitizeSchema)
   .use(rehypeMermaidBlocks)
+  .use(rehypeVideoEmbeds)
   .use(rehypeShiki, {
     themes: { light: 'github-light', dark: 'github-dark' },
     defaultLanguage: 'text',

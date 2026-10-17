@@ -7,6 +7,13 @@ const domainRelations = defineRelations(schema, (r) => ({
     revisions: r.many.hardwareRevisions(),
     releases: r.many.releases(),
     entitlements: r.many.entitlements(),
+    docPages: r.many.docPages(),
+  },
+  docPages: {
+    product: r.one.products({ from: r.docPages.productId, to: r.products.id }),
+  },
+  docAssets: {
+    product: r.one.products({ from: r.docAssets.productId, to: r.products.id }),
   },
   hardwareRevisions: {
     product: r.one.products({ from: r.hardwareRevisions.productId, to: r.products.id }),

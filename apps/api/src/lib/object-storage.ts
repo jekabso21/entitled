@@ -33,11 +33,15 @@ export async function presignUpload(key: string, contentType: string, sizeBytes:
   return { url, headers: { 'content-type': contentType } }
 }
 
-export async function presignDownload(key: string, fileName: string) {
+export async function presignDownload(
+  key: string,
+  fileName: string,
+  disposition: 'attachment' | 'inline' = 'attachment',
+) {
   const command = new GetObjectCommand({
     Bucket: env.S3_BUCKET,
     Key: key,
-    ResponseContentDisposition: `attachment; filename*=UTF-8''${encodeURIComponent(fileName)}`,
+    ResponseContentDisposition: `${disposition}; filename*=UTF-8''${encodeURIComponent(fileName)}`,
   })
   return getSignedUrl(s3Presigner, command, { expiresIn: DOWNLOAD_URL_TTL_SECONDS })
 }

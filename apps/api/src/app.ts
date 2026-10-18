@@ -8,6 +8,7 @@ import { listAuditEntriesRoute } from '#features/audit/list-audit-entries.route.
 import { artifactsRouter } from '#features/artifacts/artifacts.router.ts'
 import { brandingRouter } from '#features/branding/branding.router.ts'
 import { clientAccountsRouter } from '#features/client-accounts/client-accounts.router.ts'
+import { docsRouter } from '#features/docs/docs.router.ts'
 import { entitlementsRouter } from '#features/entitlements/entitlements.router.ts'
 import { healthRouter } from '#features/health/health.router.ts'
 import { invitationsRouter } from '#features/invitations/invitations.router.ts'
@@ -47,6 +48,7 @@ export function createApp() {
   app.route('/api', listAuditEntriesRoute)
   app.route('/api', brandingRouter)
   app.route('/api', supportRouter)
+  app.route('/api', docsRouter)
 
   app.openAPIRegistry.registerComponent('securitySchemes', 'apiKey', {
     type: 'http',

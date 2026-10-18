@@ -101,6 +101,7 @@ useSeoMeta({ title: () => product.value?.name ?? 'Product' })
             </template>
           </UTable>
         </UCard>
+        <DocPagesCard :product-id="product.id" :can-edit="canEdit" />
       </div>
     </template>
   </UDashboardPanel>

@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/render-markdown.ts"
+    ".": "./src/render-markdown.ts",
+    "./restore-alert-markers": "./src/restore-alert-markers.ts"
   },
   "scripts": {
     "lint": "eslint .",

@@ -230,6 +230,9 @@ catalogs:
     '@tiptap/extension-image':
       specifier: 3.32.0
       version: 3.32.0
+    '@tiptap/extension-list':
+      specifier: 3.32.0
+      version: 3.32.0
     '@tiptap/extension-mention':
       specifier: 3.32.0
       version: 3.32.0
@@ -464,6 +467,9 @@ importers:
       '@entitled/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@entitled/markdown':
+        specifier: workspace:*
+        version: link:../../packages/markdown
       '@floating-ui/dom':
         specifier: 'catalog:'
         version: 1.8.0
@@ -497,6 +503,9 @@ importers:
       '@tiptap/extension-image':
         specifier: 'catalog:'
         version: 3.32.0(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))
+      '@tiptap/extension-list':
+        specifier: 'catalog:'
+        version: 3.32.0(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))(@tiptap/pm@3.32.0)
       '@tiptap/extension-mention':
         specifier: 'catalog:'
         version: 3.32.0(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))(@tiptap/pm@3.32.0)(@tiptap/suggestion@3.32.0(@floating-ui/dom@1.8.0)(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))(@tiptap/pm@3.32.0))

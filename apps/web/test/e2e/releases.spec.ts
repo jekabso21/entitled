@@ -29,8 +29,11 @@ test('a published release with a file reaches the entitled client', async ({ pag
     buffer: Buffer.from('firmware-bytes'),
   })
   await expect(page.getByRole('cell', { name: 'ready' })).toBeVisible({ timeout: 20_000 })
-  await page.getByRole('button', { name: 'Publish' }).click()
-  await expect(page.getByText('Release published', { exact: true })).toBeVisible()
+  const publish = page.getByRole('button', { name: 'Publish' })
+  await expect(publish).toBeEnabled()
+  await publish.click()
+  // The status badge is durable; the toast can disappear before it is checked.
+  await expect(page.getByText('published', { exact: true })).toBeVisible()
 
   await page.getByRole('link', { name: 'Client accounts' }).click()
   await page.getByRole('link', { name: 'Acme Robotics' }).click()

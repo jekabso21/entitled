@@ -1,7 +1,14 @@
 import { createHash } from 'node:crypto'
 import { PutObjectCommand } from '@aws-sdk/client-s3'
 import type { Db } from '@entitled/db'
-import { artifacts, entitlements, hardwareRevisions, products, releases } from '@entitled/db/schema'
+import {
+  artifacts,
+  docPages,
+  entitlements,
+  hardwareRevisions,
+  products,
+  releases,
+} from '@entitled/db/schema'
 import { eq } from 'drizzle-orm'
 import { env } from '#config/env.ts'
 import { artifactStorageKey } from '#lib/object-storage.ts'
@@ -38,6 +45,38 @@ sha256sum controller-2.0.0.bin
 \`\`\`sh
 dfu-util -a 0 -D controller-2.0.0.bin
 \`\`\`
+`
+
+const gettingStarted = `Welcome to the **MC-200** documentation.
+
+> [!TIP]
+> Keep the controller on firmware 2.x for the latest CAN fixes.
+
+## Wiring
+
+| Pin | Signal | Notes |
+| --- | --- | --- |
+| 1 | 24 V | Fused at 3 A |
+| 2 | GND | |
+| 3 | CAN-H | 120 Ω termination on the last node |
+| 4 | CAN-L | |
+
+## Boot sequence
+
+\`\`\`mermaid
+sequenceDiagram
+  participant B as Bootloader
+  participant F as Firmware
+  B->>B: Verify image checksum
+  B->>F: Jump to application
+  F-->>B: Watchdog heartbeat
+\`\`\`
+
+## Checklist
+
+- [x] Mount on DIN rail
+- [x] Connect power and CAN
+- [ ] Flash the latest firmware
 `
 
 // A product, its revisions, an entitlement for the demo account and one published release.
@@ -77,6 +116,14 @@ export async function seedDemoCatalog(db: Db, clientAccountId: string) {
     })
     .returning({ id: releases.id })
   if (!release) throw new Error('Release insert returned no row')
+
+  await db.insert(docPages).values({
+    productId: product.id,
+    slug: 'getting-started',
+    title: 'Getting started',
+    body: gettingStarted,
+    status: 'published',
+  })
 
   const body = Buffer.from('MC-200 firmware 2.0.0 (demo image)\n'.repeat(512))
   const artifactId = crypto.randomUUID()

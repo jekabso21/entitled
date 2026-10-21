@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@entitled/contracts": "workspace:*",
+    "@entitled/markdown": "workspace:*",
     "@floating-ui/dom": "catalog:",
     "@iconify-json/lucide": "catalog:",
     "@nuxt/ui": "catalog:",
@@ -25,6 +26,7 @@
     "@tiptap/extension-floating-menu": "catalog:",
     "@tiptap/extension-horizontal-rule": "catalog:",
     "@tiptap/extension-image": "catalog:",
+    "@tiptap/extension-list": "catalog:",
     "@tiptap/extension-mention": "catalog:",
     "@tiptap/extension-placeholder": "catalog:",
     "@tiptap/extension-table": "catalog:",

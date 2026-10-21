@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { docAssetContentTypes } from '@entitled/contracts/docs'
+import { restoreAlertMarkers } from '@entitled/markdown/restore-alert-markers'
 import type { EditorCustomHandlers, EditorToolbarItem } from '@nuxt/ui'
 import FileHandler from '@tiptap/extension-file-handler'
+import { TaskItem, TaskList } from '@tiptap/extension-list'
 import { TableKit } from '@tiptap/extension-table'
 import type { Editor as CoreEditor } from '@tiptap/core'
 import type { Editor } from '@tiptap/vue-3'
@@ -15,6 +17,20 @@ const modes = [
   { label: 'Markdown', value: 'source', icon: 'i-lucide-file-code' },
   { label: 'Preview', value: 'preview', icon: 'i-lucide-eye' },
 ]
+
+// The editor re-serialises Markdown as soon as it loads (realigned tables and similar).
+// Only accept its output once someone actually edits in the visual tab, so opening or
+// switching tabs never rewrites a page.
+const touched = ref(false)
+watch(mode, (value) => {
+  if (value === 'visual') touched.value = false
+})
+const editorValue = computed({
+  get: () => markdown.value,
+  set: (value: string) => {
+    if (mode.value === 'visual' && touched.value) markdown.value = restoreAlertMarkers(value)
+  },
+})
 
 const toast = useToast()
 const { upload, uploading } = useDocAssetUpload(() => productId)
@@ -37,6 +53,8 @@ async function insertFiles(editor: CoreEditor, files: File[], position?: number)
 
 const extensions = [
   TableKit.configure({ table: { resizable: false } }),
+  TaskList,
+  TaskItem.configure({ nested: true }),
   FileHandler.configure({
     allowedMimeTypes: [...docAssetContentTypes],
     onDrop: (editor: CoreEditor, files: File[], position: number) => {
@@ -137,10 +155,11 @@ watch(mode, async (value) => {
     <div v-show="mode === 'visual'" class="rounded-md border border-default">
       <UEditor
         v-slot="{ editor }"
-        v-model="markdown"
+        v-model="editorValue"
         content-type="markdown"
         :extensions="extensions"
         :handlers="handlers"
+        :on-focus="() => (touched = true)"
         placeholder="Write the page… drop images or videos anywhere."
         class="min-h-96"
         :ui="{ base: 'p-4 sm:px-8 prose prose-sm dark:prose-invert max-w-none' }"

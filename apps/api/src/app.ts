@@ -18,6 +18,7 @@ import { productsRouter } from '#features/products/products.router.ts'
 import { releasesRouter } from '#features/releases/releases.router.ts'
 import { settingsRouter } from '#features/settings/settings.router.ts'
 import { supportRouter } from '#features/support/support.router.ts'
+import { vendorStaffRouter } from '#features/vendor-staff/vendor-staff.router.ts'
 import { auth } from '#lib/auth.ts'
 import { createRouter } from '#lib/create-router.ts'
 import { handleError, handleNotFound } from '#lib/error-handler.ts'
@@ -49,6 +50,7 @@ export function createApp() {
   app.route('/api', brandingRouter)
   app.route('/api', supportRouter)
   app.route('/api', docsRouter)
+  app.route('/api', vendorStaffRouter)
 
   app.openAPIRegistry.registerComponent('securitySchemes', 'apiKey', {
     type: 'http',

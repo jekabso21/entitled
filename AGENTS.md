@@ -243,6 +243,8 @@ The code says _what_; a comment says _why_. Default to none.
   - The API renders Markdown with `@entitled/markdown` (sanitize, then Shiki) and returns it next to the source (`changelogHtml`). The web app only shows that HTML through `MarkdownContent` and never renders Markdown itself; editors preview via `POST /api/markdown/preview`.
   - Mermaid fences become `<pre class="mermaid">`, which `MarkdownContent` draws in the browser.
   - Icons are bundled (`@iconify-json/lucide`) so offline installs never call the Iconify API.
+  - The docs editor (`DocEditor`) wraps `UEditor` in Markdown mode. Rich-text round-trips are lossy, so: every Markdown feature the editor must preserve needs its TipTap extension (tables, task lists); escaped callout markers are restored with `restoreAlertMarkers`; and editor output is accepted only after the user edits in the visual tab, so opening a page never rewrites it. `docs-roundtrip.spec.ts` guards this. Add a case there for any new syntax.
+  - Images and videos in docs are uploaded as doc assets and referenced as `![alt](/api/doc-assets/{id}/{file})`; `.mp4`/`.webm` sources render as `<video>`.
 - **Accessibility:** use semantic elements, give every input a label, keep everything keyboard-reachable, and use role-based selectors in Playwright tests.
 - **Dates:** render with `formatDate` / `formatDateTime` (ISO, UTC). `toLocale*()` differs between server and browser and breaks hydration.
 - **Branding:** read portal name, colour and logo through `useBranding()`; the `branding` plugin applies the colour with `updateAppConfig` before first render. Never hard-code the portal name.

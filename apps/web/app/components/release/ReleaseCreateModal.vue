@@ -34,7 +34,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <UModal v-model:open="open" title="New release">
+  <UModal
+    v-model:open="open"
+    title="New release"
+    description="It starts as a draft that only your team can see. Next you attach files and choose who gets it."
+  >
     <UButton icon="i-lucide-plus" label="New release" />
     <template #body>
       <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
@@ -45,7 +49,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
           <UInput v-model="state.title" placeholder="Optional" class="w-full" />
         </UFormField>
         <div class="flex justify-end">
-          <UButton type="submit" :loading="pending" label="Create" />
+          <UButton type="submit" :loading="pending" label="Create draft" />
         </div>
       </UForm>
     </template>

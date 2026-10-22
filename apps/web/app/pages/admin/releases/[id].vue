@@ -70,7 +70,7 @@ useSeoMeta({ title: () => (release.value ? `Release ${release.value.version}` : 
           <UButton
             v-if="release?.status === 'draft'"
             icon="i-lucide-send"
-            label="Publish"
+            label="Publish to clients"
             :loading="changingStatus"
             :disabled="hasProcessing"
             @click="changeStatus('publish')"
@@ -88,19 +88,23 @@ useSeoMeta({ title: () => (release.value ? `Release ${release.value.version}` : 
       </UDashboardNavbar>
     </template>
     <template #body>
-      <div v-if="release && product" class="grid gap-6 xl:grid-cols-5">
-        <UCard class="xl:col-span-3">
-          <ReleaseEditor
-            :key="release.id + release.status"
-            :release="release"
-            :revisions="product.revisions"
-            @saved="refresh"
-          />
-        </UCard>
-        <UCard class="xl:col-span-2">
-          <ReleaseArtifacts :release="release" @changed="refresh" />
-        </UCard>
-      </div>
+      <template v-if="release && product">
+        <ReleaseStatusPanel :release="release" />
+        <div class="grid gap-6 xl:grid-cols-5">
+          <UCard class="xl:col-span-3">
+            <ReleaseEditor
+              :key="release.id + release.status"
+              :release="release"
+              :revisions="product.revisions"
+              :product-name="product.name"
+              @saved="refresh"
+            />
+          </UCard>
+          <UCard class="self-start xl:sticky xl:top-4 xl:col-span-2">
+            <ReleaseArtifacts :release="release" @changed="refresh" />
+          </UCard>
+        </div>
+      </template>
     </template>
   </UDashboardPanel>
 </template>

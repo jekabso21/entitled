@@ -40,7 +40,19 @@ const columns: TableColumn<Invitation>[] = [
     header: 'Expires',
     cell: ({ row }) => dateCell(row.original.expiresAt),
   },
+  { id: 'actions', header: '' },
 ]
+
+const toast = useToast()
+async function revoke(invitation: Invitation) {
+  try {
+    await $fetch(`/api/invitations/${invitation.id}`, { method: 'DELETE' })
+    toast.add({ title: `Invitation for ${invitation.email} revoked`, color: 'success' })
+  } catch (error) {
+    toast.add({ title: apiErrorMessage(error), color: 'error' })
+  }
+  await refresh()
+}
 
 useSeoMeta({ title: 'Invitations' })
 </script>
@@ -68,7 +80,19 @@ useSeoMeta({ title: 'Invitations' })
         variant="subtle"
         title="Only vendor admins manage invitations"
       />
-      <UTable v-else :data="invitations" :columns="columns" empty="No pending invitations" />
+      <UTable v-else :data="invitations" :columns="columns" empty="No pending invitations">
+        <template #actions-cell="{ row }">
+          <div class="flex justify-end">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              label="Revoke"
+              :aria-label="`Revoke invitation for ${row.original.email}`"
+              @click="revoke(row.original)"
+            />
+          </div>
+        </template>
+      </UTable>
     </template>
   </UDashboardPanel>
 </template>

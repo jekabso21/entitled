@@ -12,12 +12,12 @@ test('an editor writes a page with a table and image, publishes it, and the clie
 }) => {
   const title = `Wiring guide ${String(Date.now())}`
   const vendor = await (await browser.newContext({ storageState: vendorAdminState })).newPage()
-  await open(vendor, '/admin/products')
-  await vendor.getByRole('link', { name: 'Motion Controller MC-200' }).click()
-  await vendor.getByRole('button', { name: 'New page' }).click()
-  await expect(vendor).toHaveURL(/\/admin\/docs\//)
+  await open(vendor, '/admin/docs')
+  await vendor.getByRole('link', { name: /Motion Controller MC-200/ }).click()
+  await vendor.getByRole('button', { name: 'New page' }).first().click()
+  await expect(vendor).toHaveURL(/\/admin\/docs\/[^/]+\/[^/]+$/)
 
-  await vendor.getByLabel('Title').fill(title)
+  await vendor.getByLabel('Title', { exact: true }).fill(title)
   const editor = vendor.locator('.ProseMirror')
   await editor.click()
   await vendor.keyboard.type('Connect the ')

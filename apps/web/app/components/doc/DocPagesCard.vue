@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DocPage, DocPageSummary } from '@entitled/contracts/docs'
+import type { DocPageSummary } from '@entitled/contracts/docs'
 
 const { productId, canEdit } = defineProps<{ productId: string; canEdit: boolean }>()
 
@@ -7,70 +7,50 @@ const { data: pages } = await useFetch<DocPageSummary[]>(() => `/api/products/${
   key: `docs-${productId}`,
   default: () => [],
 })
-const toast = useToast()
-const importInput = useTemplateRef<HTMLInputElement>('importInput')
-
-async function createPage() {
-  const page = await $fetch<DocPage>(`/api/products/${productId}/docs`, {
-    method: 'POST',
-    body: { title: 'Untitled page' },
-  })
-  await navigateTo(`/admin/docs/${page.id}`)
-}
-
-async function importFile(event: Event) {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
-  input.value = ''
-  if (!file) return
-  try {
-    const page = await $fetch<DocPage>(`/api/products/${productId}/docs/import`, {
-      method: 'POST',
-      body: { fileName: file.name, markdown: await file.text() },
-    })
-    await navigateTo(`/admin/docs/${page.id}`)
-  } catch (error) {
-    toast.add({ title: apiErrorMessage(error, 'Import failed'), color: 'error' })
-  }
-}
+const rows = computed(() =>
+  flattenDocTree(pages.value)
+    .filter((row) => row.depth < 2)
+    .slice(0, 8),
+)
+const publishedCount = computed(
+  () => pages.value.filter((page) => page.status === 'published').length,
+)
 </script>
 
 <template>
   <UCard>
     <template #header>
-      <div class="flex items-center justify-between gap-2">
-        <h2 class="font-semibold text-highlighted">Documentation</h2>
-        <div v-if="canEdit" class="flex gap-2">
-          <input
-            ref="importInput"
-            type="file"
-            accept=".md,.markdown,text/markdown"
-            class="hidden"
-            @change="importFile"
-          />
-          <UButton
-            icon="i-lucide-file-up"
-            variant="ghost"
-            color="neutral"
-            label="Import .md"
-            @click="importInput?.click()"
-          />
-          <UButton icon="i-lucide-plus" variant="soft" label="New page" @click="createPage" />
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <h2 class="font-semibold text-highlighted">Documentation</h2>
+          <p class="text-sm text-muted">
+            {{ pages.length }} pages, {{ publishedCount }} published. Clients see published pages.
+          </p>
         </div>
+        <UButton
+          :to="`/admin/docs/${productId}`"
+          :icon="canEdit ? 'i-lucide-pencil' : 'i-lucide-book-open'"
+          :label="canEdit ? 'Open editor' : 'View'"
+          variant="soft"
+        />
       </div>
     </template>
-    <ul v-if="pages.length" class="divide-y divide-default">
-      <li v-for="page in pages" :key="page.id" class="flex items-center justify-between gap-3 py-2">
-        <ULink :to="`/admin/docs/${page.id}`" class="font-medium text-highlighted">{{
-          page.title
-        }}</ULink>
-        <UBadge
-          variant="subtle"
-          :color="page.status === 'published' ? 'success' : 'warning'"
-          :label="page.status"
+    <ul v-if="rows.length" class="divide-y divide-default">
+      <li
+        v-for="row in rows"
+        :key="row.page.id"
+        class="flex items-center justify-between gap-3 py-2"
+        :style="{ paddingLeft: `${String(row.depth * 1.25)}rem` }"
+      >
+        <ULink :to="`/admin/docs/${productId}/${row.page.id}`" class="truncate text-highlighted">
+          {{ row.page.title }}
+        </ULink>
+        <StatusBadge
+          :color="row.page.status === 'published' ? 'success' : 'warning'"
+          :label="row.page.status"
         />
       </li>
     </ul>
-    <p v-else class="text-sm text-muted">No pages yet.</p>
+    <p v-else class="text-sm text-muted">No pages yet. Open the editor to write or import some.</p>
   </UCard>
 </template>

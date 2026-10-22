@@ -5,7 +5,12 @@
   "type": "module",
   "exports": {
     ".": "./src/render-markdown.ts",
-    "./restore-alert-markers": "./src/restore-alert-markers.ts"
+    "./restore-alert-markers": "./src/restore-alert-markers.ts",
+    "./split-markdown-pages": "./src/split-markdown-pages.ts",
+    "./local-file-refs": "./src/local-file-refs.ts",
+    "./pdf-layout-to-markdown": "./src/pdf-layout-to-markdown.ts",
+    "./line-diff": "./src/line-diff.ts",
+    "./doc-page-links": "./src/doc-page-links.ts"
   },
   "scripts": {
     "lint": "eslint .",
@@ -15,14 +20,17 @@
   "dependencies": {
     "@shikijs/rehype": "catalog:",
     "hast-util-to-string": "catalog:",
+    "rehype-katex": "catalog:",
     "rehype-sanitize": "catalog:",
     "rehype-stringify": "catalog:",
     "remark-gfm": "catalog:",
     "remark-github-blockquote-alert": "catalog:",
+    "remark-math": "catalog:",
     "remark-parse": "catalog:",
     "remark-rehype": "catalog:",
     "shiki": "catalog:",
-    "unified": "catalog:"
+    "unified": "catalog:",
+    "vfile": "catalog:"
   },
   "devDependencies": {
     "@entitled/config-eslint": "workspace:*",

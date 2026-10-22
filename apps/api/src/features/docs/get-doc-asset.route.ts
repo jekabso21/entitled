@@ -1,3 +1,4 @@
+import { docMediaContentTypes } from '@entitled/contracts/docs'
 import { docAssets } from '@entitled/db/schema'
 import { createRoute, z } from '@hono/zod-openapi'
 import { eq } from 'drizzle-orm'
@@ -12,7 +13,7 @@ const route = createRoute({
   method: 'get',
   path: '/doc-assets/{assetId}/{fileName}',
   tags: ['Docs'],
-  summary: 'Redirect to an embedded image or video for people who can see the product',
+  summary: 'Redirect to an embedded image, video or attachment for people who can see the product',
   request: { params: z.object({ assetId: z.uuid(), fileName: z.string() }) },
   responses: { 302: { description: 'Redirect to the file' } },
 })
@@ -27,5 +28,7 @@ export const getDocAssetRoute = createRouter().openapi(route, async (c) => {
     throw new DomainError('not_found', 'Asset not found')
   }
   c.header('cache-control', 'private, max-age=600')
-  return c.redirect(await presignDownload(asset.storageKey, asset.fileName, 'inline'), 302)
+  const inlineTypes: readonly string[] = [...docMediaContentTypes, 'application/pdf']
+  const disposition = inlineTypes.includes(asset.contentType) ? 'inline' : 'attachment'
+  return c.redirect(await presignDownload(asset.storageKey, asset.fileName, disposition), 302)
 })

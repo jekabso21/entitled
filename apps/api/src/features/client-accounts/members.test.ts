@@ -24,14 +24,12 @@ describe('client account members', () => {
     clientAdmin = await createSignedInUser()
     colleague = await createSignedInUser()
     accountId = await createClientAccountWith(clientAdmin.id, 'admin')
-    await db
-      .insert(members)
-      .values({
-        organizationId: accountId,
-        userId: colleague.id,
-        role: 'member',
-        createdAt: new Date(),
-      })
+    await db.insert(members).values({
+      organizationId: accountId,
+      userId: colleague.id,
+      role: 'member',
+      createdAt: new Date(),
+    })
   })
 
   const memberUrl = (userId: string, id = accountId) =>
@@ -83,14 +81,12 @@ describe('client account members', () => {
 
   it('lets a vendor admin remove a member', async () => {
     const extra = await createSignedInUser()
-    await db
-      .insert(members)
-      .values({
-        organizationId: accountId,
-        userId: extra.id,
-        role: 'member',
-        createdAt: new Date(),
-      })
+    await db.insert(members).values({
+      organizationId: accountId,
+      userId: extra.id,
+      role: 'member',
+      createdAt: new Date(),
+    })
     const res = await app.request(memberUrl(extra.id), {
       method: 'DELETE',
       headers: { cookie: vendorAdminCookie },

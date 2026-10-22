@@ -5,12 +5,15 @@ type RevisionPosition = { id: string; position: number }
 type ReleaseRange = {
   productId: string
   status: 'draft' | 'published' | 'archived'
+  audience: 'entitled' | 'selected'
+  clientAccounts: readonly { id: string }[]
   minRevisionId: string | null
   maxRevisionId: string | null
 }
 
 // Vendor staff see every release. A client sees a published release when it targets at
-// least one revision they are entitled to; a missing bound leaves that side open.
+// least one revision they are entitled to; a missing bound leaves that side open. A release
+// for selected accounts additionally needs one of the client's accounts on its list.
 export function isReleaseVisible(
   access: ProductAccess,
   release: ReleaseRange,
@@ -18,6 +21,12 @@ export function isReleaseVisible(
 ) {
   if (access.kind === 'all') return true
   if (release.status !== 'published') return false
+  if (
+    release.audience === 'selected' &&
+    !release.clientAccounts.some((account) => access.clientAccountIds.has(account.id))
+  ) {
+    return false
+  }
 
   const accessible = access.products.get(release.productId)
   if (accessible === undefined) return false

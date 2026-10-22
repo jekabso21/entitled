@@ -95,7 +95,7 @@ async function assertReleaseVisible(
 ) {
   const release = await tx.query.releases.findFirst({
     where: { id: releaseId, productId },
-    with: { product: { with: { revisions: true } } },
+    with: { product: { with: { revisions: true } }, clientAccounts: { columns: { id: true } } },
   })
   const access = await loadProductAccess(tx, actor)
   if (!release?.product || !isReleaseVisible(access, release, release.product.revisions)) {

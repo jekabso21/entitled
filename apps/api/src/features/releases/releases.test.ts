@@ -118,6 +118,62 @@ describe('releases', () => {
     expect(((await fixed.json()) as Release).changelog).toBe('- Fixed a typo')
   })
 
+  it('shows a release for selected accounts only to those accounts, even after publishing', async () => {
+    const product = await entitledProduct([])
+    const other = await createSignedInUser()
+    const otherAccountId = await createClientAccountWith(other.id, 'member')
+    await app.request(
+      '/api/entitlements',
+      jsonRequest(
+        'POST',
+        { clientAccountId: otherAccountId, productId: product.id, revisionIds: [] },
+        adminCookie,
+      ),
+    )
+    const release = await createReleaseFor(adminCookie, product.id)
+    await changeStatus(adminCookie, release.id, 'publish')
+
+    const restricted = await app.request(
+      `/api/releases/${release.id}`,
+      jsonRequest(
+        'PATCH',
+        { audience: 'selected', clientAccountIds: [clientAccountId] },
+        adminCookie,
+      ),
+    )
+    expect(restricted.status).toBe(200)
+    expect((await restricted.json()) as Release).toMatchObject({
+      audience: 'selected',
+      clientAccountIds: [clientAccountId],
+    })
+
+    const seen = await clientReleases(product.id)
+    expect(seen.map((item) => item.id)).toEqual([release.id])
+    expect(seen[0]?.clientAccountIds).toEqual([])
+    const otherList = await app.request(`/api/products/${product.id}/releases`, {
+      headers: { cookie: other.cookie },
+    })
+    expect(await otherList.json()).toEqual([])
+    const otherDirect = await app.request(`/api/releases/${release.id}`, {
+      headers: { cookie: other.cookie },
+    })
+    expect(otherDirect.status).toBe(404)
+  })
+
+  it('rejects an unknown client account in the release audience', async () => {
+    const product = await entitledProduct([])
+    const release = await createReleaseFor(adminCookie, product.id)
+    const res = await app.request(
+      `/api/releases/${release.id}`,
+      jsonRequest(
+        'PATCH',
+        { audience: 'selected', clientAccountIds: [crypto.randomUUID()] },
+        adminCookie,
+      ),
+    )
+    expect(res.status).toBe(404)
+  })
+
   it('rejects a duplicate version for the same product', async () => {
     const product = await entitledProduct([])
     await createReleaseFor(adminCookie, product.id, { version: '1.0.0' })

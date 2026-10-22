@@ -5,12 +5,22 @@ import type { Actor } from '#lib/actor.ts'
 
 // `null` revisions means every revision of that product is accessible.
 export type ProductAccess =
-  { kind: 'all' } | { kind: 'scoped'; products: ReadonlyMap<string, ReadonlySet<string> | null> }
+  | { kind: 'all' }
+  | {
+      kind: 'scoped'
+      products: ReadonlyMap<string, ReadonlySet<string> | null>
+      clientAccountIds: ReadonlySet<string>
+    }
 
 // The single source of truth for what a client user may see. Every client-facing
 // query for products, releases, artifacts and docs must filter through this.
 export async function loadProductAccess(db: Queryable, actor: Actor): Promise<ProductAccess> {
   if (actor.vendorRole) return { kind: 'all' }
+
+  const memberships = await db
+    .select({ clientAccountId: members.organizationId })
+    .from(members)
+    .where(eq(members.userId, actor.userId))
 
   const granted = await db
     .select({ id: entitlements.id, productId: entitlements.productId })
@@ -44,7 +54,11 @@ export async function loadProductAccess(db: Queryable, actor: Actor): Promise<Pr
     for (const limit of revisionIds) merged.add(limit.revisionId)
     products.set(productId, merged)
   }
-  return { kind: 'scoped', products }
+  return {
+    kind: 'scoped',
+    products,
+    clientAccountIds: new Set(memberships.map((row) => row.clientAccountId)),
+  }
 }
 
 export function canSeeProduct(access: ProductAccess, productId: string) {

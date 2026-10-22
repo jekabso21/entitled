@@ -9,7 +9,11 @@ import { isReleaseVisible } from '#lib/release-visibility.ts'
 export async function resolveArtifactDownload(db: Queryable, actor: Actor, artifactId: string) {
   const artifact = await db.query.artifacts.findFirst({
     where: { id: artifactId },
-    with: { release: { with: { product: { with: { revisions: true } } } } },
+    with: {
+      release: {
+        with: { product: { with: { revisions: true } }, clientAccounts: { columns: { id: true } } },
+      },
+    },
   })
   const release = artifact?.release
   const access = await loadProductAccess(db, actor)

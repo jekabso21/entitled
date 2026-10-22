@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { releaseAudienceSchema } from './release-audience.ts'
 
 export const updateReleaseInputSchema = z
   .strictObject({
@@ -8,6 +9,8 @@ export const updateReleaseInputSchema = z
     installInstructions: z.string().max(200_000),
     minRevisionId: z.uuid().nullable(),
     maxRevisionId: z.uuid().nullable(),
+    audience: releaseAudienceSchema,
+    clientAccountIds: z.array(z.uuid()).max(1000),
   })
   .partial()
 

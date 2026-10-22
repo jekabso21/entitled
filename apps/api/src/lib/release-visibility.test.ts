@@ -10,12 +10,15 @@ const revisions = [
 const release = {
   productId: 'p1',
   status: 'published' as const,
+  audience: 'entitled' as const,
+  clientAccounts: [],
   minRevisionId: 'rev-b',
   maxRevisionId: null,
 }
-const scoped = (revisionIds: string[] | null): ProductAccess => ({
+const scoped = (revisionIds: string[] | null, clientAccountIds = ['acme']): ProductAccess => ({
   kind: 'scoped',
   products: new Map([['p1', revisionIds ? new Set(revisionIds) : null]]),
+  clientAccountIds: new Set(clientAccountIds),
 })
 
 describe('isReleaseVisible', () => {
@@ -38,7 +41,23 @@ describe('isReleaseVisible', () => {
   })
 
   it('hides releases of products the client has no entitlement for', () => {
-    const other: ProductAccess = { kind: 'scoped', products: new Map() }
+    const other: ProductAccess = {
+      kind: 'scoped',
+      products: new Map(),
+      clientAccountIds: new Set(['acme']),
+    }
     expect(isReleaseVisible(other, release, revisions)).toBe(false)
+  })
+
+  it('shows a release for selected accounts only to clients of those accounts', () => {
+    const selected = { ...release, audience: 'selected' as const, clientAccounts: [{ id: 'acme' }] }
+    expect(isReleaseVisible(scoped(null, ['acme']), selected, revisions)).toBe(true)
+    expect(isReleaseVisible(scoped(null, ['globex']), selected, revisions)).toBe(false)
+    expect(isReleaseVisible({ kind: 'all' }, selected, revisions)).toBe(true)
+  })
+
+  it('still requires the product entitlement for a release for selected accounts', () => {
+    const selected = { ...release, audience: 'selected' as const, clientAccounts: [{ id: 'acme' }] }
+    expect(isReleaseVisible(scoped(['rev-a'], ['acme']), selected, revisions)).toBe(false)
   })
 })

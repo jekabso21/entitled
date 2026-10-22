@@ -1,6 +1,7 @@
 export * from './artifact-upload.ts'
 export * from './artifact.ts'
 export * from './create-release-input.ts'
+export * from './release-audience.ts'
 export * from './release-status.ts'
 export * from './release.ts'
 export * from './update-release-input.ts'

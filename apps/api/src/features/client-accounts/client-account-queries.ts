@@ -4,10 +4,13 @@ import {
   clientAccountDetailSchema,
 } from '@entitled/contracts/client-accounts'
 import type { Queryable } from '@entitled/db'
-import { members, organizations, users } from '@entitled/db/schema'
-import { asc, count, eq } from 'drizzle-orm'
+import { entitlements, members, organizations, users } from '@entitled/db/schema'
+import { asc, count, eq, inArray } from 'drizzle-orm'
 
-export async function listClientAccounts(db: Queryable): Promise<ClientAccount[]> {
+export async function listClientAccounts(
+  db: Queryable,
+  filter: { productId?: string | undefined } = {},
+): Promise<ClientAccount[]> {
   const rows = await db
     .select({
       id: organizations.id,
@@ -18,6 +21,17 @@ export async function listClientAccounts(db: Queryable): Promise<ClientAccount[]
     })
     .from(organizations)
     .leftJoin(members, eq(members.organizationId, organizations.id))
+    .where(
+      filter.productId
+        ? inArray(
+            organizations.id,
+            db
+              .select({ id: entitlements.clientAccountId })
+              .from(entitlements)
+              .where(eq(entitlements.productId, filter.productId)),
+          )
+        : undefined,
+    )
     .groupBy(organizations.id)
     .orderBy(asc(organizations.name))
 

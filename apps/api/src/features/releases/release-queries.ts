@@ -12,6 +12,7 @@ async function queryReleases(db: Queryable, where: { productId: string } | { id:
     with: {
       artifacts: { orderBy: { fileName: 'asc' } },
       product: { with: { revisions: true } },
+      clientAccounts: { columns: { id: true } },
     },
   })
 }
@@ -28,6 +29,8 @@ async function toRelease(row: ReleaseRow, access: ProductAccess): Promise<Releas
     version: row.version,
     title: row.title,
     status: row.status,
+    audience: row.audience,
+    clientAccountIds: access.kind === 'all' ? row.clientAccounts.map((account) => account.id) : [],
     changelog: row.changelog,
     changelogHtml: await renderMarkdownCached(row.changelog),
     installInstructions: row.installInstructions,

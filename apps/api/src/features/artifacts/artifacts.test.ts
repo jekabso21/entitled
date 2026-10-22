@@ -73,6 +73,23 @@ describe('artifacts', () => {
     expect((await download(notEntitled.artifactId, client.cookie)).status).toBe(404)
   })
 
+  it('hides files of a release meant for other client accounts', async () => {
+    const release = await draftRelease()
+    const otherAccountId = await createClientAccountWith((await createSignedInUser()).id, 'admin')
+    const { artifactId } = await uploadArtifact(adminCookie, release.id, 'private build')
+    await markArtifactReady(artifactId)
+    await app.request(
+      `/api/releases/${release.id}`,
+      jsonRequest(
+        'PATCH',
+        { audience: 'selected', clientAccountIds: [otherAccountId] },
+        adminCookie,
+      ),
+    )
+    await changeStatus(adminCookie, release.id, 'publish')
+    expect((await download(artifactId, client.cookie)).status).toBe(404)
+  })
+
   it('refuses to complete an upload whose bytes never arrived', async () => {
     const release = await draftRelease()
     const started = await app.request(

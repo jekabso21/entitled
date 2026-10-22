@@ -9,7 +9,8 @@ const route = createRoute({
   method: 'get',
   path: '/client-accounts',
   tags: ['Client accounts'],
-  summary: 'List client accounts (vendor staff)',
+  summary: 'List client accounts (vendor staff), optionally only those entitled to a product',
+  request: { query: z.object({ productId: z.uuid().optional() }) },
   responses: {
     200: {
       description: 'Client accounts',
@@ -20,5 +21,6 @@ const route = createRoute({
 
 export const listClientAccountsRoute = createRouter().openapi(route, async (c) => {
   requireVendorRole(c, ['admin', 'editor', 'support'])
-  return c.json(await listClientAccounts(db), 200)
+  const { productId } = c.req.valid('query')
+  return c.json(await listClientAccounts(db, { productId }), 200)
 })

@@ -5,9 +5,11 @@ import type { Actor } from '#lib/actor.ts'
 import { auditActor, recordAudit } from '#lib/audit.ts'
 import { DomainError } from '#lib/domain-error.ts'
 import type { TransactionScope } from '#lib/transaction.ts'
+import { replaceReleaseClientAccounts } from './release-client-accounts.ts'
 import { assertValidRevisionRange } from './release-range.ts'
 
-// Text can be corrected at any time; what a release targets is fixed once clients can see it.
+// Text and who may download can change at any time; the version and hardware it targets are
+// fixed once clients can see it.
 const draftOnlyFields = ['version', 'minRevisionId', 'maxRevisionId'] as const
 
 export async function updateRelease(
@@ -45,7 +47,11 @@ export async function updateRelease(
     input.maxRevisionId === undefined ? release.maxRevisionId : input.maxRevisionId,
   )
 
-  await tx.update(releases).set(input).where(eq(releases.id, releaseId))
+  const { clientAccountIds, ...fields } = input
+  if (clientAccountIds) await replaceReleaseClientAccounts(tx, releaseId, clientAccountIds)
+  if (Object.keys(fields).length > 0) {
+    await tx.update(releases).set(fields).where(eq(releases.id, releaseId))
+  }
   await recordAudit(tx, {
     ...auditActor(actor),
     action: 'release.updated',

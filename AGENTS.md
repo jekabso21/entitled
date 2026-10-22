@@ -19,7 +19,7 @@ pnpm check                   # lint + check-types + test + prettier --check
 pnpm format                  # prettier --write
 pnpm --filter @entitled/db db:generate --name <change>   # SQL migration from schema changes
 pnpm --filter @entitled/api auth:generate    # regenerate Better Auth tables after auth config changes
-pnpm --filter @entitled/api seed:demo        # admin@entitled.local + client@acme.local (DEMO_PASSWORD)
+pnpm --filter @entitled/api seed:demo        # vendor@demo.lv + client@demo.lv (DEMO_PASSWORD)
 pnpm --filter @entitled/api vendor:create-admin --email <e> --name <n>   # first admin on a real install
 pnpm test:e2e                # Playwright against a running stack (E2E_BASE_URL, MAILPIT_URL)
 pnpm docker:up               # full stack in Docker behind Caddy: http://localhost:8080, mail :8026
@@ -242,6 +242,8 @@ The code says _what_; a comment says _why_. Default to none.
   - Docs and changelogs are stored as **Markdown text**, never HTML or TipTap JSON, so import and export stay lossless.
   - The API renders Markdown with `@entitled/markdown` (sanitize, then Shiki) and returns it next to the source (`changelogHtml`). The web app only shows that HTML through `MarkdownContent` and never renders Markdown itself; editors preview via `POST /api/markdown/preview`.
   - Mermaid fences become `<pre class="mermaid">`, which `MarkdownContent` draws in the browser.
+  - Math uses `$…$` and `$$…$$` (remark-math, rendered with KaTeX on the server). Content tabs use the Wiki.js syntax: a heading ending in `{.tabset}` turns its next-level sub-headings into tabs, and other Markdown tools show plain headings. Both are added after sanitizing, like heading anchors, so their markup is trusted.
+  - Links between docs pages use the client URL `/products/{productId}/docs/{pageId}`, which survives renames and moves.
   - Icons are bundled (`@iconify-json/lucide`) so offline installs never call the Iconify API.
   - The docs editor (`DocEditor`) wraps `UEditor` in Markdown mode. Rich-text round-trips are lossy, so: every Markdown feature the editor must preserve needs its TipTap extension (tables, task lists); escaped callout markers are restored with `restoreAlertMarkers`; and editor output is accepted only after the user edits in the visual tab, so opening a page never rewrites it. `docs-roundtrip.spec.ts` guards this. Add a case there for any new syntax.
   - Images and videos in docs are uploaded as doc assets and referenced as `![alt](/api/doc-assets/{id}/{file})`; `.mp4`/`.webm` sources render as `<video>`.

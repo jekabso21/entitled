@@ -1,0 +1,60 @@
+/* Heading anchors, content tabs and math inside rendered docs. */
+.prose .heading-anchor {
+  margin-left: 0.4rem;
+  color: var(--ui-text-dimmed);
+  font-weight: 400;
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.prose :is(h2, h3, h4):hover .heading-anchor,
+.prose .heading-anchor:focus-visible {
+  opacity: 1;
+}
+
+.doc-tabs {
+  margin: 1.25rem 0;
+  border: 1px solid var(--ui-border);
+}
+.doc-tabs-list {
+  display: flex;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--ui-border);
+  background: var(--ui-bg-muted);
+}
+.doc-tabs-list [role='tab'] {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ui-text-muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.doc-tabs-list [role='tab']:hover {
+  color: var(--ui-text-highlighted);
+}
+.doc-tabs-list [role='tab'][aria-selected='true'] {
+  color: var(--ui-primary);
+  border-bottom-color: var(--ui-primary);
+  background: var(--ui-bg);
+}
+.doc-tabs [role='tabpanel'] {
+  padding: 0 1rem;
+}
+.doc-tabs [role='tabpanel'] > :first-child {
+  margin-top: 1rem;
+}
+.doc-tabs [role='tabpanel'] > :last-child {
+  margin-bottom: 1rem;
+}
+
+.prose .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25rem 0;
+}
+.prose .katex-error {
+  color: var(--ui-error);
+}

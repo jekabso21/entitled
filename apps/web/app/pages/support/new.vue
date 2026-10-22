@@ -88,14 +88,11 @@ useSeoMeta({ title: 'New support request' })
 
 <template>
   <div class="max-w-3xl space-y-6">
-    <UButton
-      icon="i-lucide-arrow-left"
-      variant="link"
-      color="neutral"
-      to="/support"
-      label="Support"
+    <PageHeader
+      title="New support request"
+      description="Tell the support team what happened. Add logs or photos if you have them."
+      :breadcrumbs="[{ label: 'Support', to: '/support' }, { label: 'New request' }]"
     />
-    <h1 class="text-2xl font-semibold text-highlighted">New support request</h1>
     <UCard>
       <form class="space-y-4" @submit.prevent="submit">
         <UFormField v-if="accountItems.length > 1" label="Client account">
@@ -120,13 +117,13 @@ useSeoMeta({ title: 'New support request' })
             />
           </UFormField>
         </div>
-        <UFormField label="Subject">
+        <UFormField label="Subject" help="One line, e.g. “CAN bus drops after updating to 2.4.1”">
           <UInput v-model="form.subject" class="w-full" />
         </UFormField>
         <UFormField label="Describe the problem">
           <MarkdownEditor v-model="form.body" :rows="8" />
         </UFormField>
-        <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-t border-default pt-4">
           <SupportAttachmentPicker
             :attachments="attachments"
             :uploading="uploading"

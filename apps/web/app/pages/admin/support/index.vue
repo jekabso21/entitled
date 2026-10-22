@@ -60,8 +60,7 @@ useSeoMeta({ title: 'Support' })
           </ULink>
         </template>
         <template #status-cell="{ row }">
-          <UBadge
-            variant="subtle"
+          <StatusBadge
             :color="supportStatusColor[row.original.status]"
             :label="supportStatusLabel[row.original.status]"
           />

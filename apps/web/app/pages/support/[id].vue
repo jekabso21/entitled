@@ -23,32 +23,29 @@ useSeoMeta({ title: () => thread.value?.subject ?? 'Support request' })
 
 <template>
   <div class="max-w-3xl space-y-6">
-    <UButton
-      icon="i-lucide-arrow-left"
-      variant="link"
-      color="neutral"
-      to="/support"
-      label="Support"
-    />
     <template v-if="thread">
-      <div class="flex flex-wrap items-start justify-between gap-4">
-        <div class="space-y-1">
-          <h1 class="text-2xl font-semibold text-highlighted">{{ thread.subject }}</h1>
-          <p class="text-sm text-muted">
-            {{ thread.productName
-            }}<span v-if="thread.releaseVersion"> · {{ thread.releaseVersion }}</span>
-          </p>
-        </div>
-        <div class="flex items-center gap-2">
-          <UBadge
-            variant="subtle"
+      <PageHeader
+        :title="thread.subject"
+        :breadcrumbs="[{ label: 'Support', to: '/support' }, { label: thread.subject }]"
+      >
+        <template #meta>
+          <StatusBadge
             :color="supportStatusColor[thread.status]"
             :label="supportStatusLabel[thread.status]"
           />
+          <span class="text-sm text-muted">{{ thread.productName }}</span>
+          <ReleaseVersionLabel
+            v-if="thread.releaseVersion"
+            :version="thread.releaseVersion"
+            size="sm"
+          />
+        </template>
+        <template #actions>
           <UButton
             v-if="thread.status !== 'resolved'"
             variant="outline"
             color="neutral"
+            icon="i-lucide-check"
             label="Mark resolved"
             @click="setStatus('resolved')"
           />
@@ -56,22 +53,27 @@ useSeoMeta({ title: () => thread.value?.subject ?? 'Support request' })
             v-else
             variant="outline"
             color="neutral"
+            icon="i-lucide-rotate-ccw"
             label="Reopen"
             @click="setStatus('open')"
           />
-        </div>
-      </div>
-      <div class="space-y-3">
-        <SupportMessageCard
-          v-for="message in thread.messages"
-          :key="message.id"
-          :message="message"
-        />
-      </div>
+        </template>
+      </PageHeader>
+      <ol class="space-y-5">
+        <li v-for="message in thread.messages" :key="message.id">
+          <SupportMessageCard :message="message" />
+        </li>
+      </ol>
       <UCard>
         <SupportReplyForm :thread-id="thread.id" @posted="refresh" />
       </UCard>
     </template>
-    <UAlert v-else-if="error" color="warning" variant="subtle" title="Request not found" />
+    <UAlert
+      v-else-if="error"
+      color="warning"
+      variant="subtle"
+      title="Request not found"
+      :actions="[{ label: 'All requests', to: '/support', color: 'neutral', variant: 'outline' }]"
+    />
   </div>
 </template>

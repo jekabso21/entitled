@@ -1,8 +1,8 @@
 import { expect, type Page } from '@playwright/test'
 
-export const demoPassword = process.env.DEMO_PASSWORD ?? 'entitled-demo-pass'
-export const vendorAdminEmail = 'admin@entitled.local'
-export const clientAdminEmail = 'client@acme.local'
+export const demoPassword = process.env.DEMO_PASSWORD ?? 'demo'
+export const vendorAdminEmail = 'vendor@demo.lv'
+export const clientAdminEmail = 'client@demo.lv'
 
 export const vendorAdminState = 'test/e2e/.auth/vendor-admin.json'
 export const clientAdminState = 'test/e2e/.auth/client-admin.json'

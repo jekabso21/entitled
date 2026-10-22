@@ -23,6 +23,6 @@ test('a client admin invites a colleague from the team page and can revoke it', 
 test('a vendor admin sees the vendor team with roles', async ({ browser }) => {
   const page = await (await browser.newContext({ storageState: vendorAdminState })).newPage()
   await open(page, '/admin/team')
-  await expect(page.getByRole('cell', { name: 'admin@entitled.local' })).toBeVisible()
+  await expect(page.getByRole('cell', { name: 'vendor@demo.lv' })).toBeVisible()
   await expect(page.getByRole('combobox', { name: 'Role of Vendor Admin' })).toBeDisabled()
 })

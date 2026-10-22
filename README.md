@@ -31,7 +31,7 @@ Everyone else joins by invitation: vendor admins invite staff and client users, 
 
 ### Try it with demo data
 
-Set `SEED_DEMO=true` in `deploy/.env` before the first start to create a demo vendor admin (`admin@entitled.local`), a client admin (`client@acme.local`), a product with a published release and a documentation page. Both demo users use `DEMO_PASSWORD` (default `entitled-demo-pass`). The bundled Mailpit inbox at <http://localhost:8026> shows every email the portal sends. Never enable demo data on a real install.
+Set `SEED_DEMO=true` in `deploy/.env` before the first start to create a demo vendor admin (`vendor@demo.lv`), a client admin (`client@demo.lv`), a product with a published release and a documentation page. Both demo users use `DEMO_PASSWORD` (default `demo`). The bundled Mailpit inbox at <http://localhost:8026> shows every email the portal sends. Never enable demo data on a real install.
 
 ## Going to production
 

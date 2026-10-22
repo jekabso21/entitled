@@ -10,7 +10,7 @@ if (env.NODE_ENV === 'production' && process.env.ALLOW_DEMO_SEED !== 'true') {
   throw new Error('Refusing to seed demo data in production without ALLOW_DEMO_SEED=true')
 }
 
-const password = process.env.DEMO_PASSWORD ?? 'entitled-demo-pass'
+const password = process.env.DEMO_PASSWORD ?? 'demo'
 
 async function ensureUser(email: string, name: string, vendorRole: 'admin' | null) {
   const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.email, email))
@@ -35,9 +35,9 @@ async function ensureClientAccount(name: string, slug: string) {
   return account.id
 }
 
-await ensureUser('admin@entitled.local', 'Vendor Admin', 'admin')
+await ensureUser('vendor@demo.lv', 'Vendor Admin', 'admin')
 const clientAccountId = await ensureClientAccount('Acme Robotics', 'acme-robotics')
-const clientAdminId = await ensureUser('client@acme.local', 'Acme Admin', null)
+const clientAdminId = await ensureUser('client@demo.lv', 'Acme Admin', null)
 await db
   .insert(members)
   .values({
@@ -50,5 +50,5 @@ await db
 
 await seedDemoCatalog(db, clientAccountId)
 
-console.warn('demo data ready: admin@entitled.local and client@acme.local')
+console.warn('demo data ready: vendor@demo.lv and client@demo.lv')
 await pool.end()

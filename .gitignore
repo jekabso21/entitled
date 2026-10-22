@@ -16,3 +16,4 @@ test-results/
 .DS_Store
 CLAUDE.md
 deploy/.env
+.pnpm-store/

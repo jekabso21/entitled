@@ -1,0 +1,54 @@
+stages:
+  - check
+  - build
+
+variables:
+  PNPM_VERSION: 12.14.0
+  TURBO_TELEMETRY_DISABLED: '1'
+  # Shared with the service containers below.
+  POSTGRES_USER: entitled
+  POSTGRES_PASSWORD: entitled
+  POSTGRES_DB: entitled
+  RUSTFS_ACCESS_KEY: entitled
+  RUSTFS_SECRET_KEY: entitled-ci-secret
+
+check:
+  stage: check
+  image: node:26-slim
+  services:
+    - name: postgres:18.6-alpine
+      alias: postgres
+    - name: rustfs/rustfs:1.0.3
+      alias: storage
+  cache:
+    key:
+      files: [pnpm-lock.yaml]
+    paths: [.pnpm-store]
+  before_script:
+    - npm install -g pnpm@$PNPM_VERSION
+    - pnpm install --frozen-lockfile --store-dir .pnpm-store
+    # Apps read configuration from .env; point it at the CI services.
+    - cp .env.example .env
+    - sed -i "s|^DATABASE_URL=.*|DATABASE_URL=postgres://entitled:entitled@postgres:5432/entitled|" .env
+    - sed -i "s|^S3_ENDPOINT=.*|S3_ENDPOINT=http://storage:9000|" .env
+    - sed -i "s|^S3_SECRET_ACCESS_KEY=.*|S3_SECRET_ACCESS_KEY=entitled-ci-secret|" .env
+    - sed -i "s|^BETTER_AUTH_SECRET=.*|BETTER_AUTH_SECRET=ci-only-secret-that-is-at-least-32-characters|" .env
+    - pnpm --filter @entitled/api storage:init
+  script:
+    - pnpm check
+
+build-images:
+  stage: build
+  image: docker:29
+  services:
+    - docker:29-dind
+  rules:
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - IMAGE_TAG="${CI_COMMIT_TAG:-$CI_COMMIT_SHORT_SHA}"
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker build -f deploy/Dockerfile --target server -t "$CI_REGISTRY_IMAGE/server:$IMAGE_TAG" .
+    - docker build -f deploy/Dockerfile --target web -t "$CI_REGISTRY_IMAGE/web:$IMAGE_TAG" .
+    - docker push "$CI_REGISTRY_IMAGE/server:$IMAGE_TAG"
+    - docker push "$CI_REGISTRY_IMAGE/web:$IMAGE_TAG"

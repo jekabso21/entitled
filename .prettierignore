@@ -3,3 +3,4 @@ packages/db/migrations/
 packages/db/src/schema/auth.ts
 apps/web/.nuxt/
 apps/web/.output/
+.pnpm-store/

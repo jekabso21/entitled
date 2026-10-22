@@ -60,14 +60,6 @@ useSeoMeta({ title: () => account.value?.name ?? 'Client account' })
             to="/admin/client-accounts"
           />
         </template>
-        <template #right>
-          <InvitationCreateModal
-            v-if="isAdmin && account"
-            :client-account-id="account.id"
-            :client-account-name="account.name"
-            button-label="Invite user"
-          />
-        </template>
       </UDashboardNavbar>
     </template>
     <template #body>
@@ -106,29 +98,7 @@ useSeoMeta({ title: () => account.value?.name ?? 'Client account' })
           </ul>
           <p v-else class="text-sm text-muted">No products granted yet.</p>
         </UCard>
-        <UCard>
-          <template #header>
-            <h2 class="font-semibold text-highlighted">Users</h2>
-          </template>
-          <ul v-if="account.members.length" class="divide-y divide-default">
-            <li
-              v-for="member in account.members"
-              :key="member.userId"
-              class="flex items-center justify-between gap-3 py-2"
-            >
-              <div>
-                <p class="font-medium">{{ member.name }}</p>
-                <p class="text-sm text-muted">{{ member.email }}</p>
-              </div>
-              <UBadge
-                variant="subtle"
-                :color="member.role === 'admin' ? 'primary' : 'neutral'"
-                :label="member.role === 'admin' ? 'Client admin' : 'Client user'"
-              />
-            </li>
-          </ul>
-          <p v-else class="text-sm text-muted">No users yet. Invite someone to get started.</p>
-        </UCard>
+        <AccountMembersCard :account-id="account.id" :can-manage="isAdmin" />
       </div>
     </template>
   </UDashboardPanel>

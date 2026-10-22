@@ -12,19 +12,16 @@ useSeoMeta({ title: 'Team' })
 <template>
   <div class="space-y-6">
     <h1 class="text-2xl font-semibold text-highlighted">Team</h1>
-    <UCard v-for="membership in adminMemberships" :key="membership.clientAccountId">
-      <div class="flex items-center justify-between gap-4">
-        <div>
-          <p class="font-medium text-highlighted">{{ membership.clientAccountName }}</p>
-          <p class="text-sm text-muted">Invite colleagues to access your products.</p>
-        </div>
-        <InvitationCreateModal
-          :client-account-id="membership.clientAccountId"
-          :client-account-name="membership.clientAccountName"
-          button-label="Invite colleague"
-        />
-      </div>
-    </UCard>
+    <section
+      v-for="membership in adminMemberships"
+      :key="membership.clientAccountId"
+      class="space-y-2"
+    >
+      <h2 v-if="adminMemberships.length > 1" class="font-medium text-highlighted">
+        {{ membership.clientAccountName }}
+      </h2>
+      <AccountMembersCard :account-id="membership.clientAccountId" can-manage />
+    </section>
     <UAlert
       v-if="adminMemberships.length === 0"
       color="neutral"

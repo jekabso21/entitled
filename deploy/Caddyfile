@@ -1,5 +1,18 @@
+(security_headers) {
+	header {
+		# HSTS is ignored by browsers on plain HTTP, so it is safe for local demos too.
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "DENY"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+}
+
 {$SITE_ADDRESS::80} {
 	encode zstd gzip
+	import security_headers
 
 	handle /api/* {
 		reverse_proxy api:3001
@@ -13,5 +26,6 @@
 # Presigned artifact URLs point here. Caddy keeps the original Host header, which the
 # S3 signature covers, so this must be the same address as S3_PUBLIC_ENDPOINT.
 {$STORAGE_SITE_ADDRESS::9000} {
+	import security_headers
 	reverse_proxy storage:9000
 }

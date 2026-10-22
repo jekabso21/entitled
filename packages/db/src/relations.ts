@@ -11,6 +11,13 @@ const domainRelations = defineRelations(schema, (r) => ({
   },
   docPages: {
     product: r.one.products({ from: r.docPages.productId, to: r.products.id }),
+    parent: r.one.docPages({ from: r.docPages.parentId, to: r.docPages.id }),
+    revisions: r.many.docPageRevisions(),
+    updatedBy: r.one.users({ from: r.docPages.updatedByUserId, to: r.users.id }),
+  },
+  docPageRevisions: {
+    page: r.one.docPages({ from: r.docPageRevisions.pageId, to: r.docPages.id }),
+    createdBy: r.one.users({ from: r.docPageRevisions.createdByUserId, to: r.users.id }),
   },
   docAssets: {
     product: r.one.products({ from: r.docAssets.productId, to: r.products.id }),
@@ -21,6 +28,10 @@ const domainRelations = defineRelations(schema, (r) => ({
   releases: {
     product: r.one.products({ from: r.releases.productId, to: r.products.id }),
     artifacts: r.many.artifacts(),
+    clientAccounts: r.many.organizations({
+      from: r.releases.id.through(r.releaseClientAccounts.releaseId),
+      to: r.organizations.id.through(r.releaseClientAccounts.clientAccountId),
+    }),
   },
   artifacts: {
     release: r.one.releases({ from: r.artifacts.releaseId, to: r.releases.id }),

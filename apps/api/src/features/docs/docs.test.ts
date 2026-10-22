@@ -51,7 +51,7 @@ describe('docs', () => {
     const full = (await (
       await app.request(`/api/docs/${page.id}`, { headers: { cookie: client.cookie } })
     ).json()) as DocPage
-    expect(full.bodyHtml).toContain('<h2>Steps</h2>')
+    expect(full.bodyHtml).toContain('<h2 id="steps">Steps')
   })
 
   it('exports a page as Markdown and imports Markdown as a new draft', async () => {

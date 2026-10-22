@@ -22,5 +22,5 @@ export const getDocPageRoute = createRouter().openapi(route, async (c) => {
   const access = await loadProductAccess(db, requireActor(c))
   const page = await findDocPage(db, access, c.req.valid('param').pageId)
   if (!page) throw new DomainError('not_found', 'Page not found')
-  return c.json(await toDocPage(page), 200)
+  return c.json(await toDocPage(db, page, { showAuthor: access.kind === 'all' }), 200)
 })

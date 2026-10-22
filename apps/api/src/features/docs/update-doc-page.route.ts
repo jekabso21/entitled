@@ -2,6 +2,7 @@ import { docPageSchema, updateDocPageInputSchema } from '@entitled/contracts/doc
 import { createRoute, z } from '@hono/zod-openapi'
 import { requireVendorRole } from '#lib/actor.ts'
 import { createRouter } from '#lib/create-router.ts'
+import { db } from '#lib/db.ts'
 import { withTransaction } from '#lib/transaction.ts'
 import { toDocPage } from './doc-queries.ts'
 import { updateDocPage } from './update-doc-page.ts'
@@ -28,5 +29,5 @@ export const updateDocPageRoute = createRouter().openapi(route, async (c) => {
   const { pageId } = c.req.valid('param')
   const input = c.req.valid('json')
   const page = await withTransaction((scope) => updateDocPage(scope, actor, pageId, input))
-  return c.json(await toDocPage(page), 200)
+  return c.json(await toDocPage(db, page, { showAuthor: true }), 200)
 })

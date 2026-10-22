@@ -5,6 +5,7 @@ import type { Actor } from '#lib/actor.ts'
 import { auditActor, recordAudit } from '#lib/audit.ts'
 import { DomainError } from '#lib/domain-error.ts'
 import type { TransactionScope } from '#lib/transaction.ts'
+import { recordDocRevisions } from './record-doc-revision.ts'
 
 export async function updateDocPage(
   { tx }: TransactionScope,
@@ -35,6 +36,9 @@ export async function updateDocPage(
     .where(eq(docPages.id, pageId))
     .returning()
   if (!updated) throw new Error('Doc page update returned no row')
+  if (updated.title !== page.title || updated.body !== page.body) {
+    await recordDocRevisions(tx, [updated], actor.userId)
+  }
 
   // Text edits are frequent; only publishing changes are worth an audit entry.
   if (input.status && input.status !== page.status) {

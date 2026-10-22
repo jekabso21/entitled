@@ -16,9 +16,14 @@ useSeoMeta({ title: 'Sign in' })
 
 <template>
   <div class="space-y-6">
-    <h1 class="text-lg font-semibold">
-      {{ step === 'password' ? 'Sign in' : 'Two-factor verification' }}
-    </h1>
+    <div class="space-y-1">
+      <h1 class="text-xl font-semibold tracking-tight text-highlighted">
+        {{ step === 'password' ? 'Sign in' : 'Two-factor verification' }}
+      </h1>
+      <p v-if="step === 'password'" class="text-sm text-muted">
+        Use the email address your invitation was sent to.
+      </p>
+    </div>
     <AuthSignInForm
       v-if="step === 'password'"
       @signed-in="finish"

@@ -23,7 +23,7 @@ useSeoMeta({ title: 'Accept invitation' })
   <div class="space-y-6">
     <template v-if="invitation">
       <div class="space-y-1">
-        <h1 class="text-lg font-semibold">You're invited</h1>
+        <h1 class="text-xl font-semibold tracking-tight text-highlighted">You're invited</h1>
         <p class="text-sm text-muted">
           {{
             invitation.accountName

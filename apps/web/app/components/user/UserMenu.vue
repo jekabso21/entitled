@@ -5,6 +5,7 @@ const { collapsed = false } = defineProps<{ collapsed?: boolean }>()
 
 const { data: user } = useCurrentUser()
 const signOut = useSignOut()
+const colorMode = useColorMode()
 
 const items = computed<DropdownMenuItem[][]>(() => [
   [{ label: user.value?.email ?? '', type: 'label' }],
@@ -14,21 +15,40 @@ const items = computed<DropdownMenuItem[][]>(() => [
       icon: 'i-lucide-shield-check',
       to: user.value?.vendorRole ? '/admin/security' : '/account/security',
     },
+    {
+      label: 'Dark mode',
+      icon: 'i-lucide-moon',
+      type: 'checkbox',
+      checked: colorMode.value === 'dark',
+      onUpdateChecked: (isChecked: boolean) => {
+        colorMode.preference = isChecked ? 'dark' : 'light'
+      },
+      onSelect: (event: Event) => {
+        event.preventDefault()
+      },
+    },
   ],
   [{ label: 'Sign out', icon: 'i-lucide-log-out', onSelect: () => void signOut() }],
 ])
 </script>
 
 <template>
-  <UDropdownMenu :items="items" :content="{ align: 'start' }">
+  <UDropdownMenu :items="items" :content="{ align: 'end' }" :ui="{ content: 'min-w-56' }">
     <UButton
-      :label="collapsed ? undefined : user?.name"
-      icon="i-lucide-circle-user"
       color="neutral"
       variant="ghost"
       block
       :square="collapsed"
-      class="justify-start"
-    />
+      :aria-label="collapsed ? user?.name : undefined"
+      class="justify-start gap-2"
+    >
+      <UAvatar :alt="user?.name" size="xs" />
+      <span v-if="!collapsed" class="truncate">{{ user?.name }}</span>
+      <UIcon
+        v-if="!collapsed"
+        name="i-lucide-chevrons-up-down"
+        class="ms-auto size-4 shrink-0 text-dimmed"
+      />
+    </UButton>
   </UDropdownMenu>
 </template>

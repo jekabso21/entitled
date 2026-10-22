@@ -7,7 +7,7 @@ export const supportStatusLabel: Record<SupportThreadStatus, string> = {
 }
 
 export const supportStatusColor = {
-  open: 'warning',
-  waiting_on_client: 'info',
+  open: 'info',
+  waiting_on_client: 'warning',
   resolved: 'success',
 } as const satisfies Record<SupportThreadStatus, string>

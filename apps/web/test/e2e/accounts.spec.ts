@@ -8,7 +8,7 @@ test('vendor admin creates a client account from the dashboard', async ({ page }
   await open(page, '/admin')
   await expect(page.getByText('Welcome back, Vendor Admin')).toBeVisible()
 
-  await page.getByRole('link', { name: 'Client accounts' }).click()
+  await page.getByRole('link', { name: 'Client accounts', exact: true }).click()
   const name = `Globex ${String(Date.now())}`
   await page.getByRole('button', { name: 'New client account' }).click()
   await page.getByLabel('Company name').fill(name)

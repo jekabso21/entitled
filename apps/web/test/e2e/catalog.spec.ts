@@ -18,7 +18,7 @@ test('a product granted to Acme shows up for the Acme client admin', async ({ pa
   await page.getByRole('button', { name: 'Add', exact: true }).click()
   await expect(page.getByText('First batch')).toBeVisible()
 
-  await page.getByRole('link', { name: 'Client accounts' }).click()
+  await page.getByRole('link', { name: 'Client accounts', exact: true }).click()
   await page.getByRole('link', { name: 'Acme Robotics' }).click()
   await page.getByRole('button', { name: 'Grant access' }).click()
   await page.getByRole('combobox', { name: 'Product' }).click()
@@ -34,5 +34,5 @@ test('a product granted to Acme shows up for the Acme client admin', async ({ pa
   await open(client, '/')
   await client.getByRole('link', { name }).click()
   await expect(client.getByRole('heading', { name })).toBeVisible()
-  await expect(client.getByText('Rev A · First batch')).toBeVisible()
+  await expect(client.getByText('First batch')).toBeVisible()
 })

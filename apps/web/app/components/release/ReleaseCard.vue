@@ -1,66 +1,62 @@
 <script setup lang="ts">
+import type { HardwareRevision } from '@entitled/contracts/products'
 import type { Release } from '@entitled/contracts/releases'
 
-const { release } = defineProps<{ release: Release }>()
+const {
+  release,
+  revisions = [],
+  isLatest = false,
+} = defineProps<{
+  release: Release
+  revisions?: readonly HardwareRevision[]
+  isLatest?: boolean
+}>()
+
+const compatibility = computed(() => revisionRangeLabel(release, revisions))
 </script>
 
 <template>
-  <UCard as="article">
-    <template #header>
-      <div class="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 class="text-lg font-semibold text-highlighted">
-          {{ release.version }}
-          <span v-if="release.title" class="font-normal text-muted">· {{ release.title }}</span>
-        </h2>
-        <time
-          v-if="release.publishedAt"
-          class="text-sm text-muted"
-          :datetime="release.publishedAt"
-          >{{ formatDate(release.publishedAt) }}</time
+  <article class="space-y-5 border border-default bg-default p-5 sm:p-6">
+    <header class="space-y-1.5">
+      <ReleaseVersionLabel :version="release.version" :is-latest="isLatest" size="lg" />
+      <p class="flex flex-wrap items-center gap-x-2 text-sm text-muted">
+        <time v-if="release.publishedAt" :datetime="release.publishedAt"
+          >Published {{ formatDate(release.publishedAt) }}</time
         >
-      </div>
-    </template>
-    <div class="space-y-6">
-      <MarkdownContent v-if="release.changelogHtml" :html="release.changelogHtml" />
-      <ul
-        v-if="release.artifacts.length"
-        class="divide-y divide-default rounded-md border border-default"
-      >
-        <li
-          v-for="artifact in release.artifacts"
-          :key="artifact.id"
-          class="flex flex-wrap items-center justify-between gap-3 p-3"
-        >
-          <div class="min-w-0">
-            <p class="truncate font-medium">{{ artifact.fileName }}</p>
-            <p class="text-xs text-muted">
-              {{ formatBytes(artifact.sizeBytes) }} · SHA-256
-              <code class="break-all">{{ artifact.sha256 }}</code>
-            </p>
-          </div>
-          <UButton
-            icon="i-lucide-download"
-            label="Download"
-            variant="soft"
-            :to="`/api/artifacts/${artifact.id}/download`"
-            external
-          />
-        </li>
-      </ul>
-      <UCollapsible v-if="release.installInstructionsHtml">
-        <UButton
-          label="Install instructions"
-          variant="link"
-          color="neutral"
-          trailing-icon="i-lucide-chevron-down"
-          class="px-0"
-        />
-        <template #content>
-          <div class="pt-2">
-            <MarkdownContent :html="release.installInstructionsHtml" />
-          </div>
+        <template v-if="release.title">
+          <span aria-hidden="true" class="text-dimmed">·</span>
+          <span class="text-default">{{ release.title }}</span>
         </template>
-      </UCollapsible>
-    </div>
-  </UCard>
+      </p>
+    </header>
+    <MarkdownContent v-if="release.changelogHtml" :html="release.changelogHtml" />
+    <UAlert
+      v-if="compatibility"
+      color="warning"
+      variant="subtle"
+      icon="i-lucide-triangle-alert"
+      :title="`For ${compatibility}`"
+      description="Check the hardware revision on the unit's label before you install."
+    />
+    <section v-if="release.artifacts.length" aria-label="Downloads" class="space-y-2">
+      <h3 class="text-sm font-medium text-highlighted">Downloads</h3>
+      <ReleaseDownloads :artifacts="release.artifacts" :has-primary="isLatest" />
+    </section>
+    <UCollapsible v-if="release.installInstructionsHtml" class="border-t border-default pt-3">
+      <UButton
+        label="Install instructions"
+        icon="i-lucide-book-open"
+        variant="ghost"
+        color="neutral"
+        trailing-icon="i-lucide-chevron-down"
+        class="-mx-2.5 group"
+        :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform' }"
+      />
+      <template #content>
+        <div class="pt-3">
+          <MarkdownContent :html="release.installInstructionsHtml" />
+        </div>
+      </template>
+    </UCollapsible>
+  </article>
 </template>

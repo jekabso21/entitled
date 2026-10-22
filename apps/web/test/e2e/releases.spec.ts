@@ -28,14 +28,14 @@ test('a published release with a file reaches the entitled client', async ({ pag
     mimeType: 'application/octet-stream',
     buffer: Buffer.from('firmware-bytes'),
   })
-  await expect(page.getByRole('cell', { name: 'ready' })).toBeVisible({ timeout: 20_000 })
+  await expect(page.getByText('ready', { exact: true })).toBeVisible({ timeout: 20_000 })
   const publish = page.getByRole('button', { name: 'Publish' })
   await expect(publish).toBeEnabled()
   await publish.click()
   // The status badge is durable; the toast can disappear before it is checked.
   await expect(page.getByText('published', { exact: true })).toBeVisible()
 
-  await page.getByRole('link', { name: 'Client accounts' }).click()
+  await page.getByRole('link', { name: 'Client accounts', exact: true }).click()
   await page.getByRole('link', { name: 'Acme Robotics' }).click()
   await page.getByRole('button', { name: 'Grant access' }).click()
   await page.getByRole('combobox', { name: 'Product' }).click()
@@ -48,7 +48,7 @@ test('a published release with a file reaches the entitled client', async ({ pag
   await expect(client.getByRole('heading', { name: 'Highlights' })).toBeVisible()
   await expect(client.locator('pre.shiki')).toBeVisible()
 
-  const downloadLink = client.getByRole('link', { name: 'Download' })
+  const downloadLink = client.getByRole('link', { name: /^Download / })
   const response = await client.request.get((await downloadLink.getAttribute('href')) ?? '')
   expect(await response.text()).toBe('firmware-bytes')
 })

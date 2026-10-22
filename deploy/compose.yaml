@@ -5,6 +5,7 @@ x-server-env: &server-env
   DATABASE_URL: postgres://entitled:${POSTGRES_PASSWORD}@postgres:5432/entitled
   API_URL: ${PUBLIC_URL}
   WEB_URL: ${PUBLIC_URL}
+  TRUSTED_ORIGINS: ${TRUSTED_ORIGINS:-}
   BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?set BETTER_AUTH_SECRET in deploy/.env}
   S3_ENDPOINT: http://storage:9000
   S3_PUBLIC_ENDPOINT: ${STORAGE_PUBLIC_URL}
@@ -54,7 +55,7 @@ services:
       <<: *server-env
       SEED_DEMO: ${SEED_DEMO:-false}
       ALLOW_DEMO_SEED: ${SEED_DEMO:-false}
-      DEMO_PASSWORD: ${DEMO_PASSWORD:-entitled-demo-pass}
+      DEMO_PASSWORD: ${DEMO_PASSWORD:-demo}
     command:
       - sh
       - -c

@@ -1,6 +1,7 @@
 import { CreateBucketCommand, HeadBucketCommand, PutBucketCorsCommand } from '@aws-sdk/client-s3'
 import { env } from '#config/env.ts'
 import { s3 } from '#lib/s3-client.ts'
+import { webOrigins } from '#lib/web-origins.ts'
 
 const exists = await s3
   .send(new HeadBucketCommand({ Bucket: env.S3_BUCKET }))
@@ -16,7 +17,7 @@ await s3.send(
     CORSConfiguration: {
       CORSRules: [
         {
-          AllowedOrigins: [new URL(env.WEB_URL).origin],
+          AllowedOrigins: [...webOrigins],
           AllowedMethods: ['PUT', 'GET'],
           AllowedHeaders: ['*'],
           ExposeHeaders: ['ETag'],

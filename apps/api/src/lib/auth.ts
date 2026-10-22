@@ -4,12 +4,13 @@ import { betterAuth } from 'better-auth'
 import { organization, twoFactor } from 'better-auth/plugins'
 import { env } from '#config/env.ts'
 import { db } from '#lib/db.ts'
+import { webOrigins } from '#lib/web-origins.ts'
 
 export const auth = betterAuth({
   appName: 'Entitled',
   baseURL: env.API_URL,
   secret: env.BETTER_AUTH_SECRET,
-  trustedOrigins: [env.WEB_URL],
+  trustedOrigins: [...webOrigins],
   database: drizzleAdapter(db, { provider: 'pg', usePlural: true }),
   // Accounts are invite-only: users are created when they accept an invitation (see features/invitations).
   emailAndPassword: { enabled: true, disableSignUp: true, minPasswordLength: 12 },

@@ -2,7 +2,6 @@ import { bodyLimit } from 'hono/body-limit'
 import { cors } from 'hono/cors'
 import { requestId } from 'hono/request-id'
 import { secureHeaders } from 'hono/secure-headers'
-import { env } from '#config/env.ts'
 import { apiKeysRouter } from '#features/api-keys/api-keys.router.ts'
 import { listAuditEntriesRoute } from '#features/audit/list-audit-entries.route.ts'
 import { artifactsRouter } from '#features/artifacts/artifacts.router.ts'
@@ -22,6 +21,7 @@ import { vendorStaffRouter } from '#features/vendor-staff/vendor-staff.router.ts
 import { auth } from '#lib/auth.ts'
 import { createRouter } from '#lib/create-router.ts'
 import { handleError, handleNotFound } from '#lib/error-handler.ts'
+import { webOrigins } from '#lib/web-origins.ts'
 import { session } from '#middleware/session.ts'
 
 export function createApp() {
@@ -29,7 +29,7 @@ export function createApp() {
 
   app.use(requestId())
   app.use(secureHeaders())
-  app.use(cors({ origin: env.WEB_URL, credentials: true }))
+  app.use(cors({ origin: [...webOrigins], credentials: true }))
   app.use(bodyLimit({ maxSize: 1024 * 1024 }))
 
   app.on(['GET', 'POST'], '/api/auth/*', (c) => auth.handler(c.req.raw))
